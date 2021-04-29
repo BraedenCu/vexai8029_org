@@ -40,6 +40,7 @@ def recordVideo(outputPath, depthPath):
         colorwriter.release()
         depthwriter.release()
         pipeline.stop()
+    
 
 def spliceIntoFrames(outputPath, inputVideoPath):
     cap = cv2.VideoCapture(inputVideoPath)
