@@ -3,12 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import pyrealsense2 as rs
 import os
+import shutil
+
+
+def copyFile(inputFile, outputFile):
+    shutil.copy2(inputFile, outputFile)
 
 def setupOutputDirectories(parentPath):
-    path = os.mkdir(parentPath)
-    os.mkdir(path + '/dataset')
-    os.mkdir(path + '/dataset' + '/images')
-    os.mkdir(path + '/dataset' + '/labels')
+    try: 
+        os.mkdir(parentPath + 'dataset')
+        os.mkdir(parentPath + 'dataset' + '/images')
+        os.mkdir(parentPath + 'dataset' + '/labels')
+    except:
+        print("please check your parent path. Also make sure the directories do not exist.")
 
 def recordVideo(outputPath, depthPath):
     pipeline = rs.pipeline()
@@ -48,21 +55,26 @@ def recordVideo(outputPath, depthPath):
         pipeline.stop()
     
 
-def spliceIntoFrames(outputPath, inputVideoPath):
+def spliceIntoFrames(parentPath, inputVideoPath):
+    print("splicing")
+    outputPath = parentPath + 'dataset/' + 'images'
     cap = cv2.VideoCapture(inputVideoPath)
     #save one image every 1000 frames
+
     frameIndexes = 1000
-    iteration = 0
+    iteration = 1
     name = 0
     while(cap.isOpened()):
         #ret is a bool that returns true if a frame is found
         #frame returns the frame
         ret, frame = cap.read()
+        cv2.imshow('image', frame)
         if ret == False:
             break
         if (iteration%frameIndexes)==0:
             #write frame with name in format output[number].jpg
             cv2.imwrite(outputPath + '/' + str(name) + '.jpg', frame)
+            print("writing")
             #proper naming convention
             name+=1
         iteration+=1
@@ -71,6 +83,8 @@ if __name__ == "__main__":
     parentPath = '/home/dev/dev/robotics/vexai/'
     #recordVideo(parentPath, parentPath)
     setupOutputDirectories(parentPath)
-    inputVideoPath = parentPath + 'output.avi'
+    copyFile('output.avi', 'outputCopy.avi')
+    inputVideoPath = parentPath + 'outputCopy.avi'
+    print(inputVideoPath)
     spliceIntoFrames(parentPath, inputVideoPath)
     print("Task completed")
