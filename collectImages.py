@@ -2,7 +2,13 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt 
 import pyrealsense2 as rs
+import os
 
+def setupOutputDirectories(parentPath):
+    path = os.mkdir(parentPath)
+    os.mkdir(path + '/dataset')
+    os.mkdir(path + '/dataset' + '/images')
+    os.mkdir(path + '/dataset' + '/labels')
 
 def recordVideo(outputPath, depthPath):
     pipeline = rs.pipeline()
@@ -44,22 +50,27 @@ def recordVideo(outputPath, depthPath):
 
 def spliceIntoFrames(outputPath, inputVideoPath):
     cap = cv2.VideoCapture(inputVideoPath)
-    i = 0
+    #save one image every 1000 frames
+    frameIndexes = 1000
+    iteration = 0
+    name = 0
     while(cap.isOpened()):
         #ret is a bool that returns true if a frame is found
         #frame returns the frame
         ret, frame = cap.read()
         if ret == False:
             break
-        #write frame with name in format output[number].jpg
-        cv2.imwrite(outputPath + '/' + 'output' + str(i) + '.jpg', frame)
-        i += 50
+        if (iteration%frameIndexes)==0:
+            #write frame with name in format output[number].jpg
+            cv2.imwrite(outputPath + '/' + str(name) + '.jpg', frame)
+            #proper naming convention
+            name+=1
+        iteration+=1
 
 if __name__ == "__main__":
-    #outputPathVideo = home/dev/dev/robotics/vexai/
-    #depthPathVideo = home/dev/dev/robotics/vexai/
-    #recordVideo(outputPathVideo, depthPathVideo)
-    outputPath = '/home/dev/dev/robotics/vexai/dataset/images'
-    inputVideoPath = '/home/dev/dev/robotics/vexai/output.avi'
-    spliceIntoFrames(outputPath, inputVideoPath)
+    parentPath = '/home/dev/dev/robotics/vexai/'
+    #recordVideo(parentPath, parentPath)
+    setupOutputDirectories(parentPath)
+    inputVideoPath = parentPath + 'output.avi'
+    spliceIntoFrames(parentPath, inputVideoPath)
     print("Task completed")
