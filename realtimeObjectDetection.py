@@ -15,13 +15,24 @@ import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
 import pandas as pd
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
+
+def get_model(num_classes):
+   # load an object detection model pre-trained on COCO
+   model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+   # get the number of input features for the classifier
+   in_features = model.roi_heads.box_predictor.cls_score.in_features
+   # replace the pre-trained head with a new on
+   model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+   
+   return model
 
 def init(modelPath):
 
     loaded_model = get_model(num_classes = 2)
 
-    #modelName = modelPath
+    modelName = modelPath
     loaded_model.load_state_dict(torch.load(modelName))
 
     #put the model in evaluation mode
