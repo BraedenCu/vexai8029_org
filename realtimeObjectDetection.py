@@ -4,16 +4,28 @@ import matplotlib.pyplot as plt
 import pyrealsense2 as rs
 import os
 import shutil
+import torch 
+from PIL import Image
+import pandas as pd
+import pycocotools
+import os
+import torchvision
+import numpy as np
+import torch
+import torch.utils.data
+from PIL import Image, ImageDraw
+import pandas as pd
+
 
 def init(modelPath):
 
-    #loaded_model = get_model(num_classes = 2)
+    loaded_model = get_model(num_classes = 2)
 
     #modelName = modelPath
-    #loaded_model.load_state_dict(torch.load(modelName))
+    loaded_model.load_state_dict(torch.load(modelName))
 
     #put the model in evaluation mode
-    #loaded_model.eval()
+    loaded_model.eval()
 
     #initialize realsense
     pipeline = rs.pipeline()
@@ -30,7 +42,7 @@ def main():
     config = rs.config()
     config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-    
+
     pipeline.start(config)
     try:
         while True:
@@ -56,5 +68,5 @@ def main():
        
 
 if __name__ == "__main__":
+    init("model")
     main()
-    #init("models")
