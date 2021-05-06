@@ -49,6 +49,7 @@ def recordVideo(outputPath, depthPath):
             
             if cv2.waitKey(1) == ord("q"):
                 break
+            
     finally:
         colorwriter.release()
         depthwriter.release()
