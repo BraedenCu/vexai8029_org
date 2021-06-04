@@ -12,8 +12,8 @@ def copyFile(inputFile, outputFile):
 def setupOutputDirectories(parentPath):
     try: 
         os.mkdir(parentPath + 'dataset')
-        os.mkdir(parentPath + 'dataset' + '/images')
-        os.mkdir(parentPath + 'dataset' + '/labels')
+        os.mkdir(parentPath + 'dataset' + '/images' + '/train')
+        os.mkdir(parentPath + 'dataset' + '/labels' + '/train')
     except:
         print("please check your parent path. Also make sure the directories do not exist.")
 
@@ -58,13 +58,13 @@ def recordVideo(outputPath, depthPath):
 
 def spliceIntoFrames(parentPath, inputVideoPath):
     print("splicing")
-    outputPath = parentPath + 'dataset/' + 'images'
+    outputPath = parentPath + 'dataset/' + 'images' + '/train'
     cap = cv2.VideoCapture(inputVideoPath)
     #save one image every 1000 frames
 
     frameIndexes = 20
     iteration = 1
-    name = 0
+    name = 113
     while(cap.isOpened()):
         #ret is a bool that returns true if a frame is found
         #frame returns the frame
@@ -81,7 +81,7 @@ def spliceIntoFrames(parentPath, inputVideoPath):
         iteration+=1
 
 if __name__ == "__main__":
-    parentPath = '/home/dev/dev/robotics/vexai/'
+    parentPath = '/home/dev/dev/robotics/Vex-AI-2021-Code/'
     #recordVideo(parentPath, parentPath)
     #setupOutputDirectories(parentPath)
     #copyFile('output.avi', 'outputCopy.avi')
