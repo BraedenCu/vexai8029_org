@@ -4,8 +4,8 @@ Setting up ssh on the vex administered jetson: sudo nano /etc/NetworkManager/Net
 
 
 Clone repository
-Put copy runs folder from google drive into the yolov5 folder
-run detectVexai.py from WITHIN the yolov5 folder
-you may have to tweak the camera parameter
-
-(this model was trained on a small dataset for a very limited time period, so take all results with a grain of salt)
+Put copy runs folder from google drive into the yolov5 folder  
+run detectVexai.py from WITHIN the yolov5 folder  
+you may have to tweak the camera parameter  
+  
+(this model was trained on a small dataset for a very limited time period, so take all results with a grain of salt)  
