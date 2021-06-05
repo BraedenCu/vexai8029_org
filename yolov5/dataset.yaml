@@ -1,0 +1,6 @@
+train: dataset/images/train
+val: dataset/images/train
+
+nc: 2
+
+names: ['r', 'b'] 
