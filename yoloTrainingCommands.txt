@@ -1,0 +1,7 @@
+
+
+#to train
+python3 train.py --img 400 --batch 20 --epochs 45 --data 'dataset.yaml' --cfg 'yolov5s.yaml' --weights '../modelConfig.yaml' --name pp --nosave --cache
+
+
+python3 detect.py --source 0 --weights runs/train/pp3/weights/last.pt --conf 0.25
