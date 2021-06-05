@@ -13,13 +13,11 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
-    #source = 0
-    #weights = 'yolov5/runs/train/pp3/weights/last.pt'
-    #conf = 0.25
 
 @torch.no_grad()
 def detect(opt):
-    source, weights, view_img, save_txt, imgsz = 0, 'yolov5/runs/train/pp3/weights/last.pt', opt.view_img, opt.save_txt, opt.img_size
+    source, weights, view_img, save_txt, imgsz = 0, 'runs/train/pp3/weights/last.pt', opt.view_img, opt.save_txt, opt.img_size
+    source = str(source)
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -150,7 +148,6 @@ def detect(opt):
 
     print(f'Done. ({time.time() - t0:.3f}s)')
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default='yolov5s.pt', help='model.pt path(s)')
@@ -179,11 +176,9 @@ if __name__ == '__main__':
     print(opt)
     check_requirements(exclude=('tensorboard', 'pycocotools', 'thop'))
 
-    detect(opt=opt)
-    
-    #if opt.update:  # update all models (to fix SourceChangeWarning)
-    #    for opt.weights in ['yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt']:
-    #        detect(opt=opt)
-    #        strip_optimizer(opt.weights)
-    #else:
-    #    detect(opt=opt)
+    if opt.update:  # update all models (to fix SourceChangeWarning)
+        for opt.weights in ['yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt']:
+            detect(opt=opt)
+            strip_optimizer(opt.weights)
+    else:
+        detect(opt=opt)
