@@ -20,7 +20,8 @@ REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #pip3 install pillow  
 #pip3 install tqdm
 #pip3 install matplotlib
-
+#pip3 install seaborn  
+  
 HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE
 sudo apt-get install unzip
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id={YOURIDHERE}' -r -A 'uc*' -e robots=off -nd  
