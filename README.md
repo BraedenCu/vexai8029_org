@@ -11,6 +11,7 @@ you may have to tweak the camera parameter
 (this model was trained on a small dataset for a very limited time period, so take all results with a grain of salt)  
 
 
+REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #RUN apt install nvidia-cuda-toolkit  
 #sudo apt-get install libavformat-dev  
 #sudo apt-get install libavcodec-dev  
