@@ -18,3 +18,13 @@ REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #sudo apt-get install libswscale-dev  
 #sudo apt-get install libjpeg-dev  
 #pip3 install pillow  
+
+
+HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE
+sudo apt-get install unzip
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id={YOURIDHERE}' -r -A 'uc*' -e robots=off -nd
+{YOURIDHERE} = digits in url after /d/  
+ls -l to find the largest of the three created files  
+mv uc?export=download&confirm=w3R-&id=19aByVTPC1xEMTIuDg7-h__tl2Iy-Bo5U~ runs.zip  change the name to the appropriate name and filetype  
+unzip runs.zip  
+done  :)  
