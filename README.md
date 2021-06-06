@@ -18,7 +18,7 @@ REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #sudo apt-get install libswscale-dev  
 #sudo apt-get install libjpeg-dev  
 #pip3 install pillow  
-
+#pip3 install tqdm
 
 HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE
 sudo apt-get install unzip
