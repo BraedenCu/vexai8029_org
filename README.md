@@ -20,6 +20,7 @@ REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #pip3 install pillow    
 #pip3 install tqdm  
 #pip3 install matplotlib  
+#pip3 install pandas  
 #pip3 install seaborn    
   
 HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE
