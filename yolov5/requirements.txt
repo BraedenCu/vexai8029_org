@@ -18,7 +18,6 @@ tensorboard>=2.4.1
 # plotting ------------------------------------
 seaborn>=0.11.0
 pandas
-pyrealsense2
 
 # export --------------------------------------
 # coremltools>=4.1

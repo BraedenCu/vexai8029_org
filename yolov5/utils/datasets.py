@@ -9,27 +9,28 @@ import random
 import shutil
 import time
 from itertools import repeat
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import ThreadPool, Pool
 from pathlib import Path
 from threading import Thread
 
-import pyrealsense2 as rs
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
+import yaml
 from PIL import Image, ExifTags
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from utils.general import check_requirements, xyxy2xywh, xywh2xyxy, xywhn2xyxy, xyn2xy, segment2box, segments2boxes, \
-    resample_segments, clean_str
+from utils.general import check_requirements, check_file, check_dataset, xyxy2xywh, xywh2xyxy, xywhn2xyxy, xyn2xy, \
+    segment2box, segments2boxes, resample_segments, clean_str
 from utils.torch_utils import torch_distributed_zero_first
 
 # Parameters
 help_url = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
 img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']  # acceptable image suffixes
 vid_formats = ['mov', 'avi', 'mp4', 'mpg', 'mpeg', 'm4v', 'wmv', 'mkv']  # acceptable video suffixes
+num_threads = min(8, os.cpu_count())  # number of multiprocessing threads
 logger = logging.getLogger(__name__)
 
 # Get orientation exif tag
@@ -90,119 +91,6 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
     return dataloader, dataset
 
 
-
-class Realsense2:  # multiple IP or RTSP cameras
-    def __init__(self, img_size=640, stride=32, width=640, height=480, fps=30):
-        self.mode = 'stream'
-        self.img_size = img_size
-        self.stride = stride
-
-        # Variabels for setup
-        self.width = width
-        self.height = height
-        self.fps = fps
-        self.imgs = [None]
-        self.depths = [None]
-        self.img_size = 416
-        self.half = False
-
-        # Setup
-        self.pipe = rs.pipeline()
-        self.cfg = rs.config()
-        self.cfg.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
-        self.cfg.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
-
-        # Start streaming
-        self.profile = self.pipe.start(self.cfg)
-        self.path = rs.pipeline_profile()
-        print(self.path)
-
-        # check for common shapes   
-        s = np.stack([letterbox(x, self.img_size, stride=self.stride)[0].shape for x in self.imgs], 0)  # shapes
-        self.rect = np.unique(s, axis=0).shape[0] == 1  # rect inference if all shapes equal
-        if not self.rect:
-            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
-
-
-    def update(self):
-        # Read stream `i` frames in daemon thread
-        #n, f = 0, self.frames[i]
-        while True:
-            #Wait for frames and get the data
-            self.frames = self.pipe.wait_for_frames()
-            self.depth_frame = self.frames.get_depth_frame()
-            self.color_frame = self.frames.get_color_frame()
-
-            #Wait until RGB and depth frames are synchronised
-            if not self.depth_frame or not self.color_frame:
-                continue
-            #get RGB data and convert it to numpy array
-            img0 = np.asanyarray(self.color_frame.get_data())
-            #print("ini image awal: " + str(np.shape(img0)))
-
-            #align + color depth -> for display purpose only
-            #udah di convert ke numpy array di def colorizing
-            depth0 = self.colorizing(self.aligned(self.frames))
-
-            # aligned depth -> for depth calculation
-            # udah di convert ke numpy array di def kedalaman
-            distance0 = self.kedalaman(self.frames)
-
-            #get depth_scale
-            depth_scale = self.scale(self.profile)
-
-            #Expand dimensi image biar jadi 4 dimensi (biar bisa masuk ke fungsi letterbox)
-            self.imgs = np.expand_dims(img0, axis=0)
-            #print("ini img expand: " + str(np.shape(self.imgs)))
-
-            #Kalo yang depth gaperlu, karena gaakan dimasukin ke YOLO
-            self.depths = depth0
-            self.distance = distance0
-            break
-
-        #print("ini depth awal: " + str(np.shape(self.depths)))
-
-        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
-        #print("ini s: " + str(np.shape(s)))
-        
-        self.rect = np.unique(s, axis=0).shape[0] == 1
-        print("ini rect: " + str(np.shape(self.rect)))
-
-        if not self.rect:
-            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
-
-        time.sleep(0.01)  # wait time
-
-        return self.rect, depth_scale
-          
-    def __iter__(self):
-        self.count = -1
-        return self
-
-    def __next__(self):
-        self.count += 1
-        #if not all(x.is_alive() for x in self.threads) or cv2.waitKey(1) == ord('q'):  # q to quit
-        #    cv2.destroyAllWindows()
-        #    raise StopIteration
-
-        # Letterbox
-        img0 = self.imgs.copy()
-        #img = [letterbox(x, self.img_size, auto=self.rect, stride=self.stride)[0] for x in img0]
-        img = np.asanyarray(color_frame())
-
-        # Stack
-        img = np.stack(img, 0)
-
-        # Convert
-        img = img[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB, to bsx3x416x416
-        img = np.ascontiguousarray(img)
-
-        return img, img0
-
-    def __len__(self):
-        return 0  # 1E12 frames = 32 streams at 30 FPS for 30 years
-
-
 class InfiniteDataLoader(torch.utils.data.dataloader.DataLoader):
     """ Dataloader that reuses workers
 
@@ -221,144 +109,6 @@ class InfiniteDataLoader(torch.utils.data.dataloader.DataLoader):
         for i in range(len(self)):
             yield next(self.iterator)
 
-
-class LoadRealSense2:  # Stream from Intel RealSense D435
-
-    def __init__(self, width='640', height='480', fps='30'):
-
-        # Variabels for setup
-        self.width = width
-        self.height = height
-        self.fps = fps
-        self.imgs = [None]
-        self.depths = [None]
-        self.img_size = 416
-        self.half = False
-
-        # Setup
-        self.pipe = rs.pipeline()
-        self.cfg = rs.config()
-        self.cfg.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
-        self.cfg.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
-
-        # Start streaming
-        self.profile = self.pipe.start(self.cfg)
-        self.path = rs.pipeline_profile()
-        print(self.path)
-
-        print("streaming at w = " + str(self.width) + " h = " + str(self.height) + " fps = " + str(self.fps))
-
-    def update(self):
-
-        while True:
-            #Wait for frames and get the data
-            self.frames = self.pipe.wait_for_frames()
-            self.depth_frame = self.frames.get_depth_frame()
-            self.color_frame = self.frames.get_color_frame()
-
-            #Wait until RGB and depth frames are synchronised
-            if not self.depth_frame or not self.color_frame:
-                continue
-            #get RGB data and convert it to numpy array
-            img0 = np.asanyarray(self.color_frame.get_data())
-            #print("ini image awal: " + str(np.shape(img0)))
-
-            #align + color depth -> for display purpose only
-            #udah di convert ke numpy array di def colorizing
-            depth0 = self.colorizing(self.aligned(self.frames))
-
-            # aligned depth -> for depth calculation
-            # udah di convert ke numpy array di def kedalaman
-            distance0 = self.kedalaman(self.frames)
-
-            #get depth_scale
-            depth_scale = self.scale(self.profile)
-
-            #Expand dimensi image biar jadi 4 dimensi (biar bisa masuk ke fungsi letterbox)
-            self.imgs = np.expand_dims(img0, axis=0)
-            #print("ini img expand: " + str(np.shape(self.imgs)))
-
-            #Kalo yang depth gaperlu, karena gaakan dimasukin ke YOLO
-            self.depths = depth0
-            self.distance = distance0
-            break
-
-        #print("ini depth awal: " + str(np.shape(self.depths)))
-
-        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
-        #print("ini s: " + str(np.shape(s)))
-
-        self.rect = np.unique(s, axis=0).shape[0] == 1
-        #print("ini rect: " + str(np.shape(self.rect)))
-
-        if not self.rect:
-            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
-
-        time.sleep(0.01)  # wait time
-        return self.rect, depth_scale
-
-    def scale(self, profile):
-        depth_scale = profile.get_device().first_depth_sensor().get_depth_scale()
-        return depth_scale
-
-    def kedalaman(self, frames):
-        self.align = rs.align(rs.stream.color)
-        frames = self.align.process(frames)
-        aligned_depth_frame = frames.get_depth_frame()
-        depth_real = np.asanyarray(aligned_depth_frame.get_data())
-        return depth_real
-
-    def aligned(self, frames):
-        self.align = rs.align(rs.stream.color)
-        frames = self.align.process(frames)
-        aligned_depth_frame = frames.get_depth_frame()
-        return aligned_depth_frame
-
-    def colorizing(self, aligned_depth_frame):
-        self.colorizer = rs.colorizer()
-        colorized_depth = np.asanyarray(self.colorizer.colorize(aligned_depth_frame).get_data())
-        return(colorized_depth)
-
-    def __iter__(self):
-        self.count = -1
-        return self
-
-    def __next__(self):
-        self.count += 1
-        self.rect, depth_scale = self.update()
-        img0 = self.imgs.copy()
-        depth = self.depths.copy()
-        distance = self.distance.copy()
-        if cv2.waitKey(1) == ord('q'):  # q to quit
-            cv2.destroyAllWindows()
-            raise StopIteration
-
-        img_path = 'realsense.jpg'
-
-        # Letterbox
-        #letterbox(img0, self.img_size, stride=self.stride)[0]
-        #img = [letterbox(x, new_shape=self.img_size, auto=self.rect, interp=cv2.INTER_LINEAR)[0] for x in img0]
-        #img = letterbox(img0, self.img_size, )[0] 
-        #print("ini img letterbox: " + str(np.shape(img)))
-        #letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
-        img = img0
-        
-        # Stack
-        img = np.stack(img, 0)
-        #print("ini img-padding: " + str(np.shape(img)))
-
-        # Convert Image
-        img = img[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB, to 3x416x416, uint8 to float32
-        #print("ini img-RGB: " + str(np.shape(depth)))
-        img = np.ascontiguousarray(img, dtype=np.float16 if self.half else np.float32)
-        img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        #print("ini img-final: " + str(np.shape(img)))
-
-        # Return depth, depth0, img, img0
-        return str(img_path), depth, distance, depth_scale, img, img0, None
-
-    def __len__(self):
-        return 0  # 1E12 frames = 32 streams at 30 FPS for 30 years
 
 class _RepeatSampler(object):
     """ Sampler that repeats forever
@@ -699,7 +449,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         if cache_images:
             gb = 0  # Gigabytes of cached images
             self.img_hw0, self.img_hw = [None] * n, [None] * n
-            results = ThreadPool(8).imap(lambda x: load_image(*x), zip(repeat(self), range(n)))  # 8 threads
+            results = ThreadPool(num_threads).imap(lambda x: load_image(*x), zip(repeat(self), range(n)))
             pbar = tqdm(enumerate(results), total=n)
             for i, x in pbar:
                 self.imgs[i], self.img_hw0[i], self.img_hw[i] = x  # img, hw_original, hw_resized = load_image(self, i)
@@ -710,53 +460,25 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
     def cache_labels(self, path=Path('./labels.cache'), prefix=''):
         # Cache dataset labels, check images and read shapes
         x = {}  # dict
-        nm, nf, ne, nc = 0, 0, 0, 0  # number missing, found, empty, duplicate
-        pbar = tqdm(zip(self.img_files, self.label_files), desc='Scanning images', total=len(self.img_files))
-        for i, (im_file, lb_file) in enumerate(pbar):
-            try:
-                # verify images
-                im = Image.open(im_file)
-                im.verify()  # PIL verify
-                shape = exif_size(im)  # image size
-                segments = []  # instance segments
-                assert (shape[0] > 9) & (shape[1] > 9), f'image size {shape} <10 pixels'
-                assert im.format.lower() in img_formats, f'invalid image format {im.format}'
+        nm, nf, ne, nc = 0, 0, 0, 0  # number missing, found, empty, corrupt
+        desc = f"{prefix}Scanning '{path.parent / path.stem}' images and labels..."
+        with Pool(num_threads) as pool:
+            pbar = tqdm(pool.imap_unordered(verify_image_label, zip(self.img_files, self.label_files, repeat(prefix))),
+                        desc=desc, total=len(self.img_files))
+            for im_file, l, shape, segments, nm_f, nf_f, ne_f, nc_f in pbar:
+                nm += nm_f
+                nf += nf_f
+                ne += ne_f
+                nc += nc_f
+                if im_file:
+                    x[im_file] = [l, shape, segments]
+                pbar.desc = f"{desc}{nf} found, {nm} missing, {ne} empty, {nc} corrupted"
 
-                # verify labels
-                if os.path.isfile(lb_file):
-                    nf += 1  # label found
-                    with open(lb_file, 'r') as f:
-                        l = [x.split() for x in f.read().strip().splitlines() if len(x)]
-                        if any([len(x) > 8 for x in l]):  # is segment
-                            classes = np.array([x[0] for x in l], dtype=np.float32)
-                            segments = [np.array(x[1:], dtype=np.float32).reshape(-1, 2) for x in l]  # (cls, xy1...)
-                            l = np.concatenate((classes.reshape(-1, 1), segments2boxes(segments)), 1)  # (cls, xywh)
-                        l = np.array(l, dtype=np.float32)
-                    if len(l):
-                        assert l.shape[1] == 5, 'labels require 5 columns each'
-                        assert (l >= 0).all(), 'negative labels'
-                        assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels'
-                        assert np.unique(l, axis=0).shape[0] == l.shape[0], 'duplicate labels'
-                    else:
-                        ne += 1  # label empty
-                        l = np.zeros((0, 5), dtype=np.float32)
-                else:
-                    nm += 1  # label missing
-                    l = np.zeros((0, 5), dtype=np.float32)
-                x[im_file] = [l, shape, segments]
-            except Exception as e:
-                nc += 1
-                logging.info(f'{prefix}WARNING: Ignoring corrupted image and/or label {im_file}: {e}')
-
-            pbar.desc = f"{prefix}Scanning '{path.parent / path.stem}' images and labels... " \
-                        f"{nf} found, {nm} missing, {ne} empty, {nc} corrupted"
         pbar.close()
-
         if nf == 0:
             logging.info(f'{prefix}WARNING: No labels found in {path}. See {help_url}')
-
         x['hash'] = get_hash(self.label_files + self.img_files)
-        x['results'] = nf, nm, ne, nc, i + 1
+        x['results'] = nf, nm, ne, nc, len(self.img_files)
         x['version'] = 0.2  # cache version
         try:
             torch.save(x, path)  # save cache for next time
@@ -787,7 +509,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             # MixUp https://arxiv.org/pdf/1710.09412.pdf
             if random.random() < hyp['mixup']:
                 img2, labels2 = load_mosaic(self, random.randint(0, self.n - 1))
-                r = np.random.beta(8.0, 8.0)  # mixup ratio, alpha=beta=8.0
+                r = np.random.beta(32.0, 32.0)  # mixup ratio, alpha=beta=32.0
                 img = (img * r + img2 * (1 - r)).astype(np.uint8)
                 labels = np.concatenate((labels, labels2), 0)
 
@@ -907,12 +629,12 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     hue, sat, val = cv2.split(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
     dtype = img.dtype  # uint8
 
-    x = np.arange(0, 256, dtype=np.int16)
+    x = np.arange(0, 256, dtype=r.dtype)
     lut_hue = ((x * r[0]) % 180).astype(dtype)
     lut_sat = np.clip(x * r[1], 0, 255).astype(dtype)
     lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
 
-    img_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))).astype(dtype)
+    img_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
 
@@ -1321,3 +1043,75 @@ def autosplit(path='../coco128', weights=(0.9, 0.1, 0.0), annotated_only=False):
         if not annotated_only or Path(img2label_paths([str(img)])[0]).exists():  # check label
             with open(path / txt[i], 'a') as f:
                 f.write(str(img) + '\n')  # add image to txt file
+
+
+def verify_image_label(params):
+    # Verify one image-label pair
+    im_file, lb_file, prefix = params
+    nm, nf, ne, nc = 0, 0, 0, 0  # number missing, found, empty, corrupt
+    try:
+        # verify images
+        im = Image.open(im_file)
+        im.verify()  # PIL verify
+        shape = exif_size(im)  # image size
+        segments = []  # instance segments
+        assert (shape[0] > 9) & (shape[1] > 9), f'image size {shape} <10 pixels'
+        assert im.format.lower() in img_formats, f'invalid image format {im.format}'
+
+        # verify labels
+        if os.path.isfile(lb_file):
+            nf = 1  # label found
+            with open(lb_file, 'r') as f:
+                l = [x.split() for x in f.read().strip().splitlines() if len(x)]
+                if any([len(x) > 8 for x in l]):  # is segment
+                    classes = np.array([x[0] for x in l], dtype=np.float32)
+                    segments = [np.array(x[1:], dtype=np.float32).reshape(-1, 2) for x in l]  # (cls, xy1...)
+                    l = np.concatenate((classes.reshape(-1, 1), segments2boxes(segments)), 1)  # (cls, xywh)
+                l = np.array(l, dtype=np.float32)
+            if len(l):
+                assert l.shape[1] == 5, 'labels require 5 columns each'
+                assert (l >= 0).all(), 'negative labels'
+                assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels'
+                assert np.unique(l, axis=0).shape[0] == l.shape[0], 'duplicate labels'
+            else:
+                ne = 1  # label empty
+                l = np.zeros((0, 5), dtype=np.float32)
+        else:
+            nm = 1  # label missing
+            l = np.zeros((0, 5), dtype=np.float32)
+        return im_file, l, shape, segments, nm, nf, ne, nc
+    except Exception as e:
+        nc = 1
+        logging.info(f'{prefix}WARNING: Ignoring corrupted image and/or label {im_file}: {e}')
+        return [None] * 4 + [nm, nf, ne, nc]
+
+
+def dataset_stats(path='data/coco128.yaml', verbose=False):
+    """ Return dataset statistics dictionary with images and instances counts per split per class
+    Usage: from utils.datasets import *; dataset_stats('data/coco128.yaml')
+    Arguments
+        path:           Path to data.yaml
+        verbose:        Print stats dictionary
+    """
+    path = check_file(Path(path))
+    with open(path) as f:
+        data = yaml.safe_load(f)  # data dict
+    check_dataset(data)  # download dataset if missing
+
+    nc = data['nc']  # number of classes
+    stats = {'nc': nc, 'names': data['names']}  # statistics dictionary
+    for split in 'train', 'val', 'test':
+        if split not in data:
+            stats[split] = None  # i.e. no test set
+            continue
+        x = []
+        dataset = LoadImagesAndLabels(data[split], augment=False, rect=True)  # load dataset
+        for label in tqdm(dataset.labels, total=dataset.n, desc='Statistics'):
+            x.append(np.bincount(label[:, 0].astype(int), minlength=nc))
+        x = np.array(x)  # shape(128x80)
+        stats[split] = {'instances': {'total': int(x.sum()), 'per_class': x.sum(0).tolist()},
+                        'images': {'total': dataset.n, 'unlabelled': int(np.all(x == 0, 1).sum()),
+                                   'per_class': (x > 0).sum(0).tolist()}}
+    if verbose:
+        print(yaml.dump([stats], sort_keys=False, default_flow_style=False))
+    return stats

@@ -3,4 +3,4 @@ val: dataset/images/train
 
 nc: 2
 
-names: ['r', 'b'] 
+names: ['r', 'b']
