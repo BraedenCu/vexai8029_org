@@ -143,6 +143,7 @@ class LoadFromRealsense:
         self.profile = self.pipe.start(self.cfg)
         self.paths = rs.pipeline_profile()
         self.path = str('realsense.jpg')
+        self.mode = str('image') 
     
     def __iter__(self):
         #what is this file doing
@@ -151,12 +152,12 @@ class LoadFromRealsense:
     
     def __next__(self):
         #Wait for frames and get the data
-        self.frames = self.pipe.wait_for_frames()
-        self.depth_frame = self.frames.get_depth_frame()
-        self.color_frame = self.frames.get_color_frame()
+        frames = self.pipe.wait_for_frames()
+        depth_frame = frames.get_depth_frame()
+        color_frame = frames.get_color_frame()
         
         #get RGB data and convert it to numpy array
-        img0 = np.asanyarray(self.color_frame.get_data())
+        img0 = np.asanyarray(color_frame.get_data())
 
         #align + color depth -> for display purpose only
         #udah di convert ke numpy array di def colorizing
