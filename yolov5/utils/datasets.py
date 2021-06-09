@@ -12,6 +12,7 @@ from itertools import repeat
 from multiprocessing.pool import ThreadPool, Pool
 from pathlib import Path
 from threading import Thread
+import pyrealsense2 as rs
 
 import cv2
 import numpy as np
@@ -124,7 +125,69 @@ class _RepeatSampler(object):
         while True:
             yield from iter(self.sampler)
 
+class LoadFromRealsense:
+    def __init__(self, source, img_size=640, stride=32):
+        self.img_size = img_size
+        self.stride = stride
+        self.width = 640
+        self.height = 480
+        self.fps = 30
+        
+        # Setup
+        self.pipe = rs.pipeline()
+        self.cfg = rs.config()
+        self.cfg.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
+        self.cfg.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
 
+        # Start streaming
+        self.profile = self.pipe.start(self.cfg)
+        self.path = rs.pipeline_profile()
+        print(self.path)
+    
+    def __iter__(self):
+        #what is this file doing
+        self.count = 0
+        return self
+    
+    def __next__(self):
+        #Wait for frames and get the data
+        self.frames = self.pipe.wait_for_frames()
+        self.depth_frame = self.frames.get_depth_frame()
+        self.color_frame = self.frames.get_color_frame()
+        
+        #get RGB data and convert it to numpy array
+        img0 = np.asanyarray(self.color_frame.get_data())
+
+        #align + color depth -> for display purpose only
+        #udah di convert ke numpy array di def colorizing
+        #depth0 = self.colorizing(self.aligned(self.frames))
+
+        # aligned depth -> for depth calculation
+        # udah di convert ke numpy array di def kedalaman
+        #distance0 = self.kedalaman(self.frames)
+
+        #get depth_scale
+        #depth_scale = self.scale(self.profile)
+
+        #Expand the dimensions of the image so that it becomes 4 dimensions (so that it can enter the letterbox function)
+        self.imgs = np.expand_dims(img0, axis=0)
+        #print("ini img expand: " + str(np.shape(self.imgs)))
+
+        #Kalo yang depth gaperlu, karena gaakan dimasukin ke YOLO
+        #self.depths = depth0
+        #self.distance = distance0
+        
+        # Padded resize
+        img = letterbox(img0, self.img_size, stride=self.stride)[0]
+
+        # Convert
+        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
+        img = np.ascontiguousarray(img)
+        return img, img0
+    
+    
+    
+    
 class LoadImages:  # for inference
     def __init__(self, path, img_size=640, stride=32):
         p = str(Path(path).absolute())  # os-agnostic absolute path
