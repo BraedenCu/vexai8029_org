@@ -13,7 +13,6 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
-
 @torch.no_grad()
 def detect(opt):
     source, weights, view_img, save_txt, imgsz = opt.source, 'runs/train/pp3/weights/last.pt', opt.view_img, opt.save_txt, 640
@@ -60,6 +59,7 @@ def detect(opt):
     if device.type != 'cpu':
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
     t0 = time.time()
+    
     for path, img, im0s in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -80,22 +80,21 @@ def detect(opt):
         if classify:
             pred = apply_classifier(pred, modelc, img, im0s)
 
-        print(pred)
         # Process detections
-        
         for i, det in enumerate(pred):  # detections per image
             if webcam:  # batch_size >= 1
-                p, s, im0, frame = path, f'{i}: ', im0s[i].copy(), dataset.count
+                p, s, im0, frame = path, f'{i}: ', im0s, dataset.count
             else:
                 p, s, im0, frame = path, '', im0s.copy(), getattr(dataset, 'frame', 0)
 
             p = Path(p)  # to Path
-            print(p)
+            
             #save_path = str(save_dir / p.name)  # img.jpg
             #txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-            imc = im0.copy() if opt.save_crop else im0  # for opt.save_crop
+            #imc = im0.copy() if opt.save_crop else im0  # for opt.save_crop
+            imc = im0
             if len(det):
                 #print(det)
                 # Rescale boxes from img_size to im0 size
@@ -115,6 +114,26 @@ def detect(opt):
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img or opt.save_crop or view_img:  # Add bbox to image
+                        # Calculate depth
+                        # Splitting xyxy* (measurement)
+                        xmin = int(xyxy[0])
+                        ymin = int(xyxy[1])
+                        xmax = int(xyxy[2])
+                        ymax = int(xyxy[3])
+                        # Calculate width and height
+                        w = xmax - xmin
+                        h = ymax - ymin
+
+                        # Calculating measured centroid of the object (in Pixel)
+                        xc = int(round(((xmax + xmin) / 2), 0))
+                        yc = int(round(((ymax + ymin) / 2), 0))
+                        depth_pixel = [xc, yc]
+                        xc_msr = float((xyxy[2] + xyxy[0])/2)
+                        yc_msr = float((xyxy[3] + xyxy[1])/2)
+                        meas_pixel = [xc_msr, yc_msr]
+                        
+                        print(xc, yc)
+                        
                         c = int(cls)  # integer class
                         label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                         plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
@@ -124,10 +143,11 @@ def detect(opt):
                     #print(xyxy)
 
             # Print time (inference + NMS)
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
             if view_img:
+                print("streaming")
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
@@ -150,13 +170,24 @@ def detect(opt):
                             save_path += '.mp4'
                         vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                     vid_writer.write(im0)
+
+                # Update prev_n
+                prev_n = int(new_n)
             """
             
+            # Stream results
+            if view_img:
+                cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
+                cv2.imshow('RealSense', im0)
+                if cv2.waitKey(1) == ord('q'):  # q to quit
+                    raise StopIteration
+    
+           
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
-        print(f"Results saved to {save_dir}{s}")
+        #print(f"Results saved to {save_dir}{s}")
 
-    print(f'Done. ({time.time() - t0:.3f}s)')
+    #print(f'Done. ({time.time() - t0:.3f}s)')
 
 
 if __name__ == '__main__':
