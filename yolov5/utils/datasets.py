@@ -13,6 +13,7 @@ from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from threading import Thread
 
+import pyrealsense2 as rs
 import cv2
 import numpy as np
 import torch
@@ -89,6 +90,119 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
     return dataloader, dataset
 
 
+
+class Realsense2:  # multiple IP or RTSP cameras
+    def __init__(self, img_size=640, stride=32, width=640, height=480, fps=30):
+        self.mode = 'stream'
+        self.img_size = img_size
+        self.stride = stride
+
+        # Variabels for setup
+        self.width = width
+        self.height = height
+        self.fps = fps
+        self.imgs = [None]
+        self.depths = [None]
+        self.img_size = 416
+        self.half = False
+
+        # Setup
+        self.pipe = rs.pipeline()
+        self.cfg = rs.config()
+        self.cfg.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
+        self.cfg.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
+
+        # Start streaming
+        self.profile = self.pipe.start(self.cfg)
+        self.path = rs.pipeline_profile()
+        print(self.path)
+
+        # check for common shapes   
+        s = np.stack([letterbox(x, self.img_size, stride=self.stride)[0].shape for x in self.imgs], 0)  # shapes
+        self.rect = np.unique(s, axis=0).shape[0] == 1  # rect inference if all shapes equal
+        if not self.rect:
+            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
+
+
+    def update(self):
+        # Read stream `i` frames in daemon thread
+        #n, f = 0, self.frames[i]
+        while True:
+            #Wait for frames and get the data
+            self.frames = self.pipe.wait_for_frames()
+            self.depth_frame = self.frames.get_depth_frame()
+            self.color_frame = self.frames.get_color_frame()
+
+            #Wait until RGB and depth frames are synchronised
+            if not self.depth_frame or not self.color_frame:
+                continue
+            #get RGB data and convert it to numpy array
+            img0 = np.asanyarray(self.color_frame.get_data())
+            #print("ini image awal: " + str(np.shape(img0)))
+
+            #align + color depth -> for display purpose only
+            #udah di convert ke numpy array di def colorizing
+            depth0 = self.colorizing(self.aligned(self.frames))
+
+            # aligned depth -> for depth calculation
+            # udah di convert ke numpy array di def kedalaman
+            distance0 = self.kedalaman(self.frames)
+
+            #get depth_scale
+            depth_scale = self.scale(self.profile)
+
+            #Expand dimensi image biar jadi 4 dimensi (biar bisa masuk ke fungsi letterbox)
+            self.imgs = np.expand_dims(img0, axis=0)
+            #print("ini img expand: " + str(np.shape(self.imgs)))
+
+            #Kalo yang depth gaperlu, karena gaakan dimasukin ke YOLO
+            self.depths = depth0
+            self.distance = distance0
+            break
+
+        #print("ini depth awal: " + str(np.shape(self.depths)))
+
+        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
+        #print("ini s: " + str(np.shape(s)))
+        
+        self.rect = np.unique(s, axis=0).shape[0] == 1
+        print("ini rect: " + str(np.shape(self.rect)))
+
+        if not self.rect:
+            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
+
+        time.sleep(0.01)  # wait time
+
+        return self.rect, depth_scale
+          
+    def __iter__(self):
+        self.count = -1
+        return self
+
+    def __next__(self):
+        self.count += 1
+        #if not all(x.is_alive() for x in self.threads) or cv2.waitKey(1) == ord('q'):  # q to quit
+        #    cv2.destroyAllWindows()
+        #    raise StopIteration
+
+        # Letterbox
+        img0 = self.imgs.copy()
+        #img = [letterbox(x, self.img_size, auto=self.rect, stride=self.stride)[0] for x in img0]
+        img = np.asanyarray(color_frame())
+
+        # Stack
+        img = np.stack(img, 0)
+
+        # Convert
+        img = img[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB, to bsx3x416x416
+        img = np.ascontiguousarray(img)
+
+        return img, img0
+
+    def __len__(self):
+        return 0  # 1E12 frames = 32 streams at 30 FPS for 30 years
+
+
 class InfiniteDataLoader(torch.utils.data.dataloader.DataLoader):
     """ Dataloader that reuses workers
 
@@ -107,6 +221,144 @@ class InfiniteDataLoader(torch.utils.data.dataloader.DataLoader):
         for i in range(len(self)):
             yield next(self.iterator)
 
+
+class LoadRealSense2:  # Stream from Intel RealSense D435
+
+    def __init__(self, width='640', height='480', fps='30'):
+
+        # Variabels for setup
+        self.width = width
+        self.height = height
+        self.fps = fps
+        self.imgs = [None]
+        self.depths = [None]
+        self.img_size = 416
+        self.half = False
+
+        # Setup
+        self.pipe = rs.pipeline()
+        self.cfg = rs.config()
+        self.cfg.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
+        self.cfg.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
+
+        # Start streaming
+        self.profile = self.pipe.start(self.cfg)
+        self.path = rs.pipeline_profile()
+        print(self.path)
+
+        print("streaming at w = " + str(self.width) + " h = " + str(self.height) + " fps = " + str(self.fps))
+
+    def update(self):
+
+        while True:
+            #Wait for frames and get the data
+            self.frames = self.pipe.wait_for_frames()
+            self.depth_frame = self.frames.get_depth_frame()
+            self.color_frame = self.frames.get_color_frame()
+
+            #Wait until RGB and depth frames are synchronised
+            if not self.depth_frame or not self.color_frame:
+                continue
+            #get RGB data and convert it to numpy array
+            img0 = np.asanyarray(self.color_frame.get_data())
+            #print("ini image awal: " + str(np.shape(img0)))
+
+            #align + color depth -> for display purpose only
+            #udah di convert ke numpy array di def colorizing
+            depth0 = self.colorizing(self.aligned(self.frames))
+
+            # aligned depth -> for depth calculation
+            # udah di convert ke numpy array di def kedalaman
+            distance0 = self.kedalaman(self.frames)
+
+            #get depth_scale
+            depth_scale = self.scale(self.profile)
+
+            #Expand dimensi image biar jadi 4 dimensi (biar bisa masuk ke fungsi letterbox)
+            self.imgs = np.expand_dims(img0, axis=0)
+            #print("ini img expand: " + str(np.shape(self.imgs)))
+
+            #Kalo yang depth gaperlu, karena gaakan dimasukin ke YOLO
+            self.depths = depth0
+            self.distance = distance0
+            break
+
+        #print("ini depth awal: " + str(np.shape(self.depths)))
+
+        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
+        #print("ini s: " + str(np.shape(s)))
+
+        self.rect = np.unique(s, axis=0).shape[0] == 1
+        #print("ini rect: " + str(np.shape(self.rect)))
+
+        if not self.rect:
+            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
+
+        time.sleep(0.01)  # wait time
+        return self.rect, depth_scale
+
+    def scale(self, profile):
+        depth_scale = profile.get_device().first_depth_sensor().get_depth_scale()
+        return depth_scale
+
+    def kedalaman(self, frames):
+        self.align = rs.align(rs.stream.color)
+        frames = self.align.process(frames)
+        aligned_depth_frame = frames.get_depth_frame()
+        depth_real = np.asanyarray(aligned_depth_frame.get_data())
+        return depth_real
+
+    def aligned(self, frames):
+        self.align = rs.align(rs.stream.color)
+        frames = self.align.process(frames)
+        aligned_depth_frame = frames.get_depth_frame()
+        return aligned_depth_frame
+
+    def colorizing(self, aligned_depth_frame):
+        self.colorizer = rs.colorizer()
+        colorized_depth = np.asanyarray(self.colorizer.colorize(aligned_depth_frame).get_data())
+        return(colorized_depth)
+
+    def __iter__(self):
+        self.count = -1
+        return self
+
+    def __next__(self):
+        self.count += 1
+        self.rect, depth_scale = self.update()
+        img0 = self.imgs.copy()
+        depth = self.depths.copy()
+        distance = self.distance.copy()
+        if cv2.waitKey(1) == ord('q'):  # q to quit
+            cv2.destroyAllWindows()
+            raise StopIteration
+
+        img_path = 'realsense.jpg'
+
+        # Letterbox
+        #letterbox(img0, self.img_size, stride=self.stride)[0]
+        #img = [letterbox(x, new_shape=self.img_size, auto=self.rect, interp=cv2.INTER_LINEAR)[0] for x in img0]
+        #img = letterbox(img0, self.img_size, )[0] 
+        #print("ini img letterbox: " + str(np.shape(img)))
+        #letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
+        img = img0
+        
+        # Stack
+        img = np.stack(img, 0)
+        #print("ini img-padding: " + str(np.shape(img)))
+
+        # Convert Image
+        img = img[:, :, :, ::-1].transpose(0, 3, 1, 2)  # BGR to RGB, to 3x416x416, uint8 to float32
+        #print("ini img-RGB: " + str(np.shape(depth)))
+        img = np.ascontiguousarray(img, dtype=np.float16 if self.half else np.float32)
+        img /= 255.0  # 0 - 255 to 0.0 - 1.0
+        #print("ini img-final: " + str(np.shape(img)))
+
+        # Return depth, depth0, img, img0
+        return str(img_path), depth, distance, depth_scale, img, img0, None
+
+    def __len__(self):
+        return 0  # 1E12 frames = 32 streams at 30 FPS for 30 years
 
 class _RepeatSampler(object):
     """ Sampler that repeats forever
