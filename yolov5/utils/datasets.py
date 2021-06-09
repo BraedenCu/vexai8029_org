@@ -141,8 +141,8 @@ class LoadFromRealsense:
 
         # Start streaming
         self.profile = self.pipe.start(self.cfg)
-        self.path = rs.pipeline_profile()
-        print(self.path)
+        self.paths = rs.pipeline_profile()
+        self.path = str('realsense.jpg')
     
     def __iter__(self):
         #what is this file doing
@@ -183,7 +183,8 @@ class LoadFromRealsense:
         # Convert
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
-        return img, img0
+        
+        return self.path, img, img0
     
     
     
