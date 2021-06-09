@@ -147,7 +147,6 @@ def detect(opt):
 
             # Stream results
             if view_img:
-                print("streaming")
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
