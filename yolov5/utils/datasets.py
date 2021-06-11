@@ -132,6 +132,7 @@ class LoadFromRealsense:
         self.width = 640
         self.height = 480
         self.fps = 30
+        self.depthframe = None
         
         # Setup
         self.pipe = rs.pipeline()
@@ -145,6 +146,11 @@ class LoadFromRealsense:
         self.path = str('realsense.jpg')
         self.mode = str('image') 
     
+    def getdepth(self, x, y):
+        #returns the depth to that specific pixel in meters
+        depth = self.depth_frame.get_distance(int(x),int(y))
+        return depth
+        
     def __iter__(self):
         #what is this file doing
         self.count = 0
@@ -153,7 +159,7 @@ class LoadFromRealsense:
     def __next__(self):
         #Wait for frames and get the data
         frames = self.pipe.wait_for_frames()
-        depth_frame = frames.get_depth_frame()
+        self.depth_frame = frames.get_depth_frame()
         color_frame = frames.get_color_frame()
         
         #get RGB data and convert it to numpy array
