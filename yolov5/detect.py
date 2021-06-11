@@ -79,6 +79,7 @@ def detect(opt):
 
         # Process detections
         ballArr = []
+        centerArr = []
         depthArr = []
         # detections per image
         for i, det in enumerate(pred):  
@@ -100,18 +101,6 @@ def detect(opt):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
                 
-                """
-                detectionIDs = det[:, -1]
-                detectionIDsNumpy = detectionIDs.numpy()
-                for c in range(0, detectionIDsNumpy.size):
-                    #iterate over detected objects
-                    detectionID = detectionIDsNumpy[0]
-                    if detectionID >= 1:
-                        ballArr.append('b')
-                    
-                    if detectionID < 1:
-                        ballArr.append('r')
-                """
                 # Print results
                 #for c in det[:, -1].unique():
                 #    n = (det[:, -1] == c).sum()  # detections per class
@@ -126,7 +115,6 @@ def detect(opt):
                     else:
                         ballArr.append('b')
                         
-
                     # Add bbox to image
                     if save_img or opt.save_crop or view_img or True:  # Add bbox to image
                         # Calculate depth
@@ -147,9 +135,9 @@ def detect(opt):
                         yc_msr = float((xyxy[3] + xyxy[1])/2)
                         meas_pixel = [xc_msr, yc_msr]
                         
-                        #print(xc, yc)
-                        
-                        depthArr.append([xc, yc])
+                        #append depth in meters to center point
+                        depthArr.append(dataset.getdepth(xc, yc)) 
+                        centerArr.append([xc, yc])
                         
                         c = int(cls)  # integer class
                         label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
@@ -161,38 +149,15 @@ def detect(opt):
                     
                     
             # Print time (inference + NMS)
-            #print(f'{s}Done. ({t2 - t1:.3f}s)')
+            print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
             if view_img:
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
-            # Save results (image with detections)
-            """
-            if save_img:
-                if dataset.mode == 'image':
-                    cv2.imwrite(save_path, im0)
-                else:  # 'video' or 'stream'
-                    if vid_path != save_path:  # new video
-                        vid_path = save_path
-                        if isinstance(vid_writer, cv2.VideoWriter):
-                            vid_writer.release()  # release previous video writer
-                        if vid_cap:  # video
-                            fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                            w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                            h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        else:  # stream
-                            fps, w, h = 30, im0.shape[1], im0.shape[0]
-                            save_path += '.mp4'
-                        vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-                    vid_writer.write(im0)
-
-                # Update prev_n
-                prev_n = int(new_n)
-            """
-            
             print(ballArr)
+            print(centerArr)
             print(depthArr)
             
             # Stream results
