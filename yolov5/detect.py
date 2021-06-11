@@ -100,29 +100,32 @@ def detect(opt):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
                 
+                """
                 detectionIDs = det[:, -1]
                 detectionIDsNumpy = detectionIDs.numpy()
-                #for c in range(0, detectionIDsNumpy.size):
+                for c in range(0, detectionIDsNumpy.size):
                     #iterate over detected objects
-                detectionID = detectionIDsNumpy[0]
-                if detectionID >= 1:
-                    ballArr.append('r')
-                
-                if detectionID < 1:
-                    ballArr.append('b')
-        
+                    detectionID = detectionIDsNumpy[0]
+                    if detectionID >= 1:
+                        ballArr.append('b')
+                    
+                    if detectionID < 1:
+                        ballArr.append('r')
+                """
                 # Print results
                 #for c in det[:, -1].unique():
                 #    n = (det[:, -1] == c).sum()  # detections per class
                 #    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string            
                 
+                detectionIDsNumpy = det[:, -1].numpy()
+                i = detectionIDsNumpy.size - 1
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    #if save_txt:  # Write to file
-                    #    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                    #    line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format
-                    #    with open(txt_path + '.txt', 'a') as f:
-                    #        f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                    if i >= 1:
+                        ballArr.append('r')
+                    else:
+                        ballArr.append('b')
+                        
 
                     # Add bbox to image
                     if save_img or opt.save_crop or view_img or True:  # Add bbox to image
@@ -153,6 +156,9 @@ def detect(opt):
                         plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                         if opt.save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+                    
+                    i-=1
+                    
                     
             # Print time (inference + NMS)
             #print(f'{s}Done. ({t2 - t1:.3f}s)')
