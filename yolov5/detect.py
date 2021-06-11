@@ -19,10 +19,7 @@ def detect(opt):
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
-
-    # Directories
-    #save_dir = increment_path(Path(opt.project) / opt.name, exist_ok=opt.exist_ok)  # increment run
-    #(save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
+    view_img = True
 
     # Initialize
     set_logging()
@@ -48,7 +45,7 @@ def detect(opt):
     # Set Dataloader
     vid_path, vid_writer = None, None
     if webcam:
-        view_img = check_imshow()
+        #view_img = check_imshow()
         cudnn.benchmark = True  # set True to speed up constant image size inference
         #dataset = LoadStreams(source, img_size=imgsz, stride=stride)
         dataset = LoadFromRealsense(source, img_size=imgsz, stride=stride)
@@ -81,7 +78,10 @@ def detect(opt):
             pred = apply_classifier(pred, modelc, img, im0s)
 
         # Process detections
-        for i, det in enumerate(pred):  # detections per image
+        ballArr = []
+        depthArr = []
+        # detections per image
+        for i, det in enumerate(pred):  
             if webcam:  # batch_size >= 1
                 p, s, im0, frame = path, f'{i}: ', im0s, dataset.count
             else:
@@ -89,22 +89,33 @@ def detect(opt):
 
             p = Path(p)  # to Path
             
-            #save_path = str(save_dir / p.name)  # img.jpg
-            #txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
+     
             #imc = im0.copy() if opt.save_crop else im0  # for opt.save_crop
             imc = im0
+            
+            #if something is detected run the following    
             if len(det):
-                #print(det)
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
-
+                
+                detectionIDs = det[:, -1]
+                detectionIDsNumpy = detectionIDs.numpy()
+                #for c in range(0, detectionIDsNumpy.size):
+                    #iterate over detected objects
+                detectionID = detectionIDsNumpy[0]
+                if detectionID >= 1:
+                    ballArr.append('r')
+                
+                if detectionID < 1:
+                    ballArr.append('b')
+        
                 # Print results
-                for c in det[:, -1].unique():
-                    n = (det[:, -1] == c).sum()  # detections per class
-                    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
-
+                #for c in det[:, -1].unique():
+                #    n = (det[:, -1] == c).sum()  # detections per class
+                #    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string            
+                
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     #if save_txt:  # Write to file
@@ -113,7 +124,8 @@ def detect(opt):
                     #    with open(txt_path + '.txt', 'a') as f:
                     #        f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
-                    if save_img or opt.save_crop or view_img:  # Add bbox to image
+                    # Add bbox to image
+                    if save_img or opt.save_crop or view_img or True:  # Add bbox to image
                         # Calculate depth
                         # Splitting xyxy* (measurement)
                         xmin = int(xyxy[0])
@@ -132,7 +144,9 @@ def detect(opt):
                         yc_msr = float((xyxy[3] + xyxy[1])/2)
                         meas_pixel = [xc_msr, yc_msr]
                         
-                        print(xc, yc)
+                        #print(xc, yc)
+                        
+                        depthArr.append([xc, yc])
                         
                         c = int(cls)  # integer class
                         label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
@@ -140,13 +154,10 @@ def detect(opt):
                         if opt.save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                     
-                    #print(xyxy)
-
             # Print time (inference + NMS)
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
-            view_img = False
             if view_img:
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
@@ -175,6 +186,9 @@ def detect(opt):
                 prev_n = int(new_n)
             """
             
+            print(ballArr)
+            print(depthArr)
+            
             # Stream results
             if view_img:
                 cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
@@ -182,10 +196,6 @@ def detect(opt):
                 if cv2.waitKey(1) == ord('q'):  # q to quit
                     raise StopIteration
     
-           
-    #if save_txt or save_img:
-    #    s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
-
     #print(f'Done. ({time.time() - t0:.3f}s)')
 
 

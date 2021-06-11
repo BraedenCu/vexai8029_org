@@ -7,3 +7,5 @@ python3 train.py --img 400 --batch 20 --epochs 45 --data 'dataset.yaml' --cfg 'y
 
 #performing detection using trained model on webcam feed
 python3 detect.py --source 0 --weights runs/train/pp3/weights/last.pt --conf 0.25
+
+python3 detect.py --source 0 --weights runs/train/finpp/weights/last.pt
