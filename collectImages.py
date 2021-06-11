@@ -77,7 +77,7 @@ def spliceIntoFrames(parentPath, inputVideoPath, outputPath):
             print("writing")
             #proper naming convention
             name+=1
-        iteration+=1
+            iteration+=1
 
 if __name__ == "__main__":
     parentPath = '/home/dev/dev/robotics/vexai8029/'
@@ -85,6 +85,6 @@ if __name__ == "__main__":
     #setupOutputDirectories(parentPath)
     #copyFile('output.avi', 'outputCopy.avi')
     inputVideoPath = parentPath + 'output.avi'
-    outputPath = parentPath + 'testImages/'
-    spliceIntoFrames(parentPath, inputVideoPath, outputPath)
+    #outputPath = parentPath + 'testImages/'
+    #spliceIntoFrames(parentPath, inputVideoPath, outputPath)
     print("Task completed")

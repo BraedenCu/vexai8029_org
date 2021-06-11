@@ -1,0 +1,2 @@
+#run container in interactive mode
+docker run -it yolov5:rs
