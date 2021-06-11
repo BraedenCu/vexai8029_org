@@ -143,7 +143,7 @@ def detect(opt):
                     #print(xyxy)
 
             # Print time (inference + NMS)
-            #print(f'{s}Done. ({t2 - t1:.3f}s)')
+            print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
             view_img = False
@@ -183,11 +183,10 @@ def detect(opt):
                     raise StopIteration
     
            
-    if save_txt or save_img:
-        s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
-        #print(f"Results saved to {save_dir}{s}")
+    #if save_txt or save_img:
+    #    s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
 
-    print(f'Done. ({time.time() - t0:.3f}s)')
+    #print(f'Done. ({time.time() - t0:.3f}s)')
 
 
 if __name__ == '__main__':
