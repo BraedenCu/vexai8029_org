@@ -15,7 +15,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 @torch.no_grad()
 def detect(opt):
-    source, weights, view_img, save_txt, imgsz = opt.source, 'runs/train/pp3/weights/last.pt', opt.view_img, opt.save_txt, 640
+    source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, 640
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -146,6 +146,7 @@ def detect(opt):
             #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
+            view_img = False
             if view_img:
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
@@ -186,12 +187,12 @@ def detect(opt):
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         #print(f"Results saved to {save_dir}{s}")
 
-    #print(f'Done. ({time.time() - t0:.3f}s)')
+    print(f'Done. ({time.time() - t0:.3f}s)')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='yolov5s.pt', help='model.pt path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='runs/train/pp3/weights/last.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='data/images', help='source')  # file/folder, 0 for webcam
     parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='object confidence threshold')
