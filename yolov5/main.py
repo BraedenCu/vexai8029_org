@@ -22,7 +22,7 @@ import serial
 import struct
 import time
 import zlib
-import vexaiBrainComm 
+import vexBrainComm 
 
 #is this needed?
 @torch.no_grad()
@@ -37,17 +37,36 @@ def producer(out_q):
         
 def consumer(in_q):
     while True:
+        #initiate communication with brain
+        brain = vexBrainComm.initiateControlLoop()
+        
+        if brain == 0:
+            print("brain is not connected")
+            break
+        
         #get data
         data = in_q.get()
-        if data[0] != None:
+        
+        if len(data) >= 0:
             #params: x, y, width, height, 
-            x = vexaiBrainComm.FifoObjectBoxType(0)
+            x = vexBrainComm.FifoObjectBoxType(0)
             x.x = data[0][0]
             x.y = data[0][1]
-            x.depth = data[1][0]
-            x.classId = data[2][0]
+            x.depth = data[1]
+            x.classId = int(data[2])
+            #not actual values, just placeholders (NEED TO BE ACCOUNTED FOR LATER TO ACCOUNT FOR BALLS IN GOALS. IE, FIGURE OUT RATIO OF WIDTH TO 
+            #HEIGHT, AND IF IT IS NOT NEAR 1:1, THEN DISCARD IT)
+            x.width = 1
+            x.height = 1
+            #also placeholder
+            x.prob = 1
+            packeddata = x.getPacked()
+            x.printVerbose()
+            #data in unpacked format
+            vexBrainComm.sendData(brain, x)
+            
         #process data
-        print(data)
+        #print(data)
    
 if __name__ == "__main__":
     q = multiprocessing.Queue()
@@ -58,7 +77,4 @@ if __name__ == "__main__":
     p1.start()
     p2.start()
     
-    
-    #p1.join()
-    #p2.join()
 
