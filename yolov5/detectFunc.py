@@ -109,7 +109,7 @@ def detect(source, weights, view_img, imgsz, queue):
             pred = apply_classifier(pred, modelc, img, im0s)
 
         # Process detections
-        ballArr = []
+        idArr = []
         centerArr = []
         depthArr = []
         # detections per image
@@ -139,13 +139,12 @@ def detect(source, weights, view_img, imgsz, queue):
                 
                 detectionIDsNumpy = det[:, -1].numpy()
                 i = detectionIDsNumpy.size - 1
+                
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    if detectionIDsNumpy[i] >= 1:
-                        ballArr.append('b')
-                    else:
-                        ballArr.append('r')
-                        
+                    #add id of detected object to array
+                    idArr.append(detectionIDsNumpy[i])
+                    
                     # Add bbox to image
                     if save_img or opt.save_crop or view_img or True:  # Add bbox to image
                         # Calculate depth
@@ -186,7 +185,8 @@ def detect(source, weights, view_img, imgsz, queue):
                         closestIndex = o
                         closest = depthArr[o]
                     
-                queue.put([centerArr[closestIndex], depthArr[closestIndex]])
+                #add the closest ball to the queue. Add the location of the center of the ball, the depth to the center of the ball, and the id of the ball
+                queue.put([centerArr[closestIndex], depthArr[closestIndex], idArr[closestIndex]])
                     
                     
             # Print time (inference + NMS)
