@@ -472,39 +472,42 @@ print("")
 print("...HELLO...")
 print("")
 
-try:
-    brain = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
 
-    # VEX Brain request for data (it sends ASCII data currently):
-    #     b'AA55CC3301\r\n'
+def initiateControlLoop():
+    try:
+        brain = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
 
-    mpt = MapPacketType()
+        # VEX Brain request for data (it sends ASCII data currently):
+        #     b'AA55CC3301\r\n'
 
-    msgRxCnt = 0
-    while True:
-        try:
-            data = brain.readline()
-            if data:
-                msgRxCnt += 1
-                print("RX :", data)
-                #if (msgRxCnt % 10) == 0:
-                if (msgRxCnt % 1) == 0:
-                    mpt.reset()
-                    mpt.setTestData()
-                    #mpt.printVerbose()
-                    #mpt.printTerse()
-                    #print("")
-                    packedMsg = mpt.getPackedMsg()
-                    #print("")
-                    printHex(packedMsg)
-                    brain.write(packedMsg)
-                    #break
-        except:
-            break
+        mpt = MapPacketType()
 
-    brain.close()
-except:
-    print("***ERROR***; Couldn't open /dev/ttyACM1")
+        msgRxCnt = 0
+        while True:
+            try:
+                data = brain.readline()
+                if data:
+                    msgRxCnt += 1
+                    print("RX :", data)
+                    #if (msgRxCnt % 10) == 0:
+                    if (msgRxCnt % 1) == 0:
+                        mpt.reset()
+                        mpt.setTestData()
+                        #mpt.printVerbose()
+                        #mpt.printTerse()
+                        #print("")
+                        packedMsg = mpt.getPackedMsg()
+                        #print("")
+                        printHex(packedMsg)
+                        brain.write(packedMsg)
+                        #break
+            except:
+                break
+
+        brain.close()
+    except:
+        print("***ERROR***; Couldn't open /dev/ttyACM1")
+        return 0
 
 
 print("")
