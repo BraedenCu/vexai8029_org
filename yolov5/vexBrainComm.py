@@ -472,23 +472,28 @@ print("")
 print("...HELLO...")
 print("")
 
+def sendData(brain, data):
+    packedData = data.getPacked()
+    brain.write(packedData)
 
 def initiateControlLoop():
     try:
         brain = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
-
+        print("successfully connected to brain")
+        return brain
         # VEX Brain request for data (it sends ASCII data currently):
         #     b'AA55CC3301\r\n'
 
-        mpt = MapPacketType()
+        #mpt = MapPacketType()
 
+        """
         msgRxCnt = 0
         while True:
             try:
-                data = brain.readline()
-                if data:
+                dataReceived = brain.readline()
+                if dataReceived:
                     msgRxCnt += 1
-                    print("RX :", data)
+                    #print("RX :", data)
                     #if (msgRxCnt % 10) == 0:
                     if (msgRxCnt % 1) == 0:
                         mpt.reset()
@@ -501,10 +506,12 @@ def initiateControlLoop():
                         printHex(packedMsg)
                         brain.write(packedMsg)
                         #break
+                        
             except:
                 break
-
-        brain.close()
+            """
+            
+            #brain.close()
     except:
         print("***ERROR***; Couldn't open /dev/ttyACM1")
         return 0
