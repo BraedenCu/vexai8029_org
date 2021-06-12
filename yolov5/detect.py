@@ -80,7 +80,7 @@ def detect(opt):
             pred = apply_classifier(pred, modelc, img, im0s)
 
         # Process detections
-        ballArr = []
+        idArr = []
         centerArr = []
         depthArr = []
         # detections per image
@@ -110,12 +110,11 @@ def detect(opt):
                 
                 detectionIDsNumpy = det[:, -1].numpy()
                 i = detectionIDsNumpy.size - 1
+                
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    if detectionIDsNumpy[i] >= 1:
-                        ballArr.append('b')
-                    else:
-                        ballArr.append('r')
+                    #add id of detected object to array
+                    idArr.append(detectionIDsNumpy[i])
                         
                     # Add bbox to image
                     if save_img or opt.save_crop or view_img or True:  # Add bbox to image
