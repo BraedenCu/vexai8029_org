@@ -13,14 +13,15 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
+
 @torch.no_grad()
 def detect(opt):
-    source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, 640
+    source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.viewimg, opt.save_txt, 640
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
-    view_img = True
-
+    view_img = True if view_img == 1 else False
+    
     # Initialize
     set_logging()
     device = select_device(opt.device)
@@ -147,6 +148,7 @@ def detect(opt):
                     
                     i-=1
                 
+                #determine which ball is the closest
                 closest = depthArr[0]    
                 closestIndex = 0
                 for o in range(1, len(depthArr)-1):
@@ -190,7 +192,7 @@ if __name__ == '__main__':
     parser.add_argument('--iou-thres', type=float, default=0.45, help='IOU threshold for NMS')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum number of detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
-    parser.add_argument('--view-img', action='store_true', help='display results')
+    parser.add_argument('--viewimg', type=int, help='display results', default=0)
     parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--save-crop', action='store_true', help='save cropped prediction boxes')
