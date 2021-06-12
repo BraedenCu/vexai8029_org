@@ -110,10 +110,10 @@ def detect(opt):
                 i = detectionIDsNumpy.size - 1
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    if i >= 1:
-                        ballArr.append('r')
-                    else:
+                    if detectionIDsNumpy[i] >= 1:
                         ballArr.append('b')
+                    else:
+                        ballArr.append('r')
                         
                     # Add bbox to image
                     if save_img or opt.save_crop or view_img or True:  # Add bbox to image
@@ -130,10 +130,10 @@ def detect(opt):
                         # Calculating measured centroid of the object (in Pixel)
                         xc = int(round(((xmax + xmin) / 2), 0))
                         yc = int(round(((ymax + ymin) / 2), 0))
-                        depth_pixel = [xc, yc]
-                        xc_msr = float((xyxy[2] + xyxy[0])/2)
-                        yc_msr = float((xyxy[3] + xyxy[1])/2)
-                        meas_pixel = [xc_msr, yc_msr]
+                        #depth_pixel = [xc, yc]
+                        #xc_msr = float((xyxy[2] + xyxy[0])/2)
+                        #yc_msr = float((xyxy[3] + xyxy[1])/2)
+                        #meas_pixel = [xc_msr, yc_msr]
                         
                         #append depth in meters to center point
                         depthArr.append(dataset.getdepth(xc, yc)) 
@@ -146,6 +146,10 @@ def detect(opt):
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                     
                     i-=1
+                
+                #closest = None    
+                #for o in range(0, len(depthArr)-1):
+                #    if depthArr[o]
                     
                     
             # Print time (inference + NMS)
@@ -156,9 +160,11 @@ def detect(opt):
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
-            print(ballArr)
-            print(centerArr)
-            print(depthArr)
+            #print(ballArr)
+            #print(centerArr)
+            #print(depthArr)
+            #print('\n')
+            
             
             # Stream results
             if view_img:
