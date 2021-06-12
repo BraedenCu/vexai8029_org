@@ -147,13 +147,18 @@ def detect(opt):
                     
                     i-=1
                 
-                #closest = None    
-                #for o in range(0, len(depthArr)-1):
-                #    if depthArr[o]
+                closest = depthArr[0]    
+                closestIndex = 0
+                for o in range(1, len(depthArr)-1):
+                    if depthArr[o] <= closest:
+                        closestIndex = o
+                        closest = depthArr[o]
+                             
+                print(ballArr[closestIndex])
                     
                     
             # Print time (inference + NMS)
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
             # Stream results
             if view_img:
