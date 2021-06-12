@@ -473,8 +473,13 @@ print("...HELLO...")
 print("")
 
 def sendData(brain, data):
-    packedData = data.getPacked()
-    brain.write(packedData)
+    # VEX Brain request for data (it sends ASCII data currently):
+    dataReceived = brain.readline()
+    if dataReceived:
+        packedData = data.getPacked()
+        brain.write(packedData)
+    else:
+        print("brain not requesting to receive data. Somethings up :/")
 
 def initiateControlLoop():
     try:
