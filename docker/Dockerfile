@@ -73,4 +73,6 @@ RUN ln -s /usr/bin/python3.8 /usr/bin/python3
 
 ENV PYTHONPATH=/build/wrappers/python:/usr/local/lib
 
+RUN gdown https://drive.google.com/uc?id=1hJ2mb444mUlHpMsUpyxBMpbIxl38HDIZ
+
 WORKDIR /yolov5
