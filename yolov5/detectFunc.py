@@ -137,7 +137,8 @@ def detect(source, weights, view_img, imgsz, queue):
                 #    n = (det[:, -1] == c).sum()  # detections per class
                 #    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string            
                 
-                detectionIDsNumpy = det[:, -1].numpy()
+                detNumCPU = det.copy()
+                detectionIDsNumpy = detNumCPU[:, -1].numpy()
                 i = detectionIDsNumpy.size - 1
                 
                 # Write results
