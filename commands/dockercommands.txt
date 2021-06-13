@@ -1,2 +1,5 @@
 #run container in interactive mode
 docker run -it yolov5:rs
+
+#to build a container 
+docker build -t vexai:0.1 .
