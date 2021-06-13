@@ -31,7 +31,7 @@ import vexBrainComm
 def producer(out_q):
     while True:
         #run detection script, queue is updated within the detect script
-        detect(0, 'runs/train/finpp/weights/last.pt', 1, 640, out_q)
+        detect(0, 'runs/train/finpp/weights/last.pt', 0, 640, out_q)
         #out_q parameter to function run
         
         
