@@ -43,7 +43,7 @@ class VexLogic:
         "Set up the DetectInfo based on RealSense info."
         
         if self.numTargets == 0:
-            #logging.info("Setting numTargets to 1")
+            logging.info("Setting numTargets to 1")
             self.numTargets = 1
         if self.detectInfo == None:
             self.detectInfo = DetectInfo.DetectInfo(detectRealSense.classId, detectRealSense.confidence)
@@ -137,7 +137,7 @@ class VexLogic:
             if self.numTargets == 0 or self.detectInfo == None:
                 self.brain.setNoTargets()
             else:
-                #self.detectInfo.display()
+                self.detectInfo.display()
                 #self.detectInfo.displayBrief()
                 self.brain.addDetect(self.detectInfo)
 
