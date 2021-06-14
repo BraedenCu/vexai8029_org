@@ -51,7 +51,7 @@ def consumer(in_q):
         
         #get data
         data = in_q.get()
-        
+        """
         if len(data) >= 0:
             #params: x, y, width, height, 
             x = brain.FifoObjectBoxType(0)
@@ -70,7 +70,10 @@ def consumer(in_q):
             #data in unpacked format
             brain.startComm()
             #vexBrain.sendData(brain, x)
-            
+        """    
+        brain.setTestData2()
+        brain.startComm()
+        
         #process data
         #print(data)
    
