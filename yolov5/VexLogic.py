@@ -48,40 +48,9 @@ class VexLogic:
         if self.detectInfo == None:
             self.detectInfo = DetectInfo.DetectInfo(detectRealSense.classId, detectRealSense.confidence)
         else:
-            if self.detectInfo.width == 0:
-                self.detectInfo.confidence = detectRealSense.confidence
-                self.detectInfo.left       = detectRealSense.left
-                self.detectInfo.top        = detectRealSense.top
-                self.detectInfo.right      = detectRealSense.right
-                self.detectInfo.bottom     = detectRealSense.bottom
-                self.detectInfo.width      = detectRealSense.width
-                self.detectInfo.height     = detectRealSense.height
-                self.detectInfo.distance   = detectRealSense.distance
-                self.detectInfo.area       = detectRealSense.area
-                self.detectInfo.displayBrief()
-            else:
-                resultW = 0.0
-                resultH = 0.0
-                resultD = 0.0
-                if detectRealSense.width >= self.detectInfo.width:
-                    increase = detectRealSense.width - self.detectInfo.width
-                    resultW = increase / self.detectInfo.width
-                else:
-                    increase = self.detectInfo.width - detectRealSense.width
-                    resultW = increase / detectRealSense.width
-                if detectRealSense.height >= self.detectInfo.height:
-                    increase = detectRealSense.height - self.detectInfo.height
-                    resultH = increase / self.detectInfo.height
-                else:
-                    increase = self.detectInfo.height - detectRealSense.height
-                    resultH = increase / detectRealSense.height
-                if detectRealSense.distance >= self.detectInfo.distance:
-                    increase = detectRealSense.distance - self.detectInfo.distance
-                    resultD = increase / self.detectInfo.distance
-                else:
-                    increase = self.detectInfo.distance - detectRealSense.distance
-                    resultD = increase / detectRealSense.distance
-                if (resultW + resultH + resultD) < 0.7:
+            #prevents error that occours when bugged balls are detected with depth 0
+            if self.detectInfo.distance != 0:
+                if self.detectInfo.width == 0:
                     self.detectInfo.confidence = detectRealSense.confidence
                     self.detectInfo.left       = detectRealSense.left
                     self.detectInfo.top        = detectRealSense.top
@@ -93,7 +62,40 @@ class VexLogic:
                     self.detectInfo.area       = detectRealSense.area
                     self.detectInfo.displayBrief()
                 else:
-                    logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
+                    resultW = 0.0
+                    resultH = 0.0
+                    resultD = 0.0
+                    if detectRealSense.width >= self.detectInfo.width:
+                        increase = detectRealSense.width - self.detectInfo.width
+                        resultW = increase / self.detectInfo.width
+                    else:
+                        increase = self.detectInfo.width - detectRealSense.width
+                        resultW = increase / detectRealSense.width
+                    if detectRealSense.height >= self.detectInfo.height:
+                        increase = detectRealSense.height - self.detectInfo.height
+                        resultH = increase / self.detectInfo.height
+                    else:
+                        increase = self.detectInfo.height - detectRealSense.height
+                        resultH = increase / detectRealSense.height
+                    if detectRealSense.distance >= self.detectInfo.distance:
+                        increase = detectRealSense.distance - self.detectInfo.distance
+                        resultD = increase / self.detectInfo.distance
+                    else:
+                        increase = self.detectInfo.distance - detectRealSense.distance
+                        resultD = increase / detectRealSense.distance
+                    if (resultW + resultH + resultD) < 0.7:
+                        self.detectInfo.confidence = detectRealSense.confidence
+                        self.detectInfo.left       = detectRealSense.left
+                        self.detectInfo.top        = detectRealSense.top
+                        self.detectInfo.right      = detectRealSense.right
+                        self.detectInfo.bottom     = detectRealSense.bottom
+                        self.detectInfo.width      = detectRealSense.width
+                        self.detectInfo.height     = detectRealSense.height
+                        self.detectInfo.distance   = detectRealSense.distance
+                        self.detectInfo.area       = detectRealSense.area
+                        self.detectInfo.displayBrief()
+                    else:
+                        logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
 
             
             
