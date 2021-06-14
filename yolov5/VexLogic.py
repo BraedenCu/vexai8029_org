@@ -42,7 +42,7 @@ class VexLogic:
     def setDetectInfo(self, detectRealSense):
         "Set up the DetectInfo based on RealSense info."
         
-        detectRealSense.display()
+        #detectRealSense.display()
         
         if self.numTargets == 0:
             logging.info("Setting numTargets to 1")
@@ -65,7 +65,8 @@ class VexLogic:
                     self.detectInfo.height     = detectRealSense.height
                     self.detectInfo.distance   = detectRealSense.distance
                     self.detectInfo.area       = detectRealSense.area
-                    self.detectInfo.displayBrief()
+                    print(self.detectInto.distance)
+                    #self.detectInfo.displayBrief()
                 else:
                     resultW = 0.0
                     resultH = 0.0
