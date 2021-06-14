@@ -31,6 +31,7 @@ class VexRealSense:
         return VexRealSense.__instance
 
     def startDetecting(self):
+        """
         "TBD"
         logging.info("startDetecting")
         #MODEL_STR = "ssd-mobilenet-v1"
@@ -117,6 +118,8 @@ class VexRealSense:
 
             if numDetections > 10000:
                 break
+        logging.info("Exiting detection loop")
+        """
         logging.info("Exiting detection loop")
 
     def threadEntry(self):
