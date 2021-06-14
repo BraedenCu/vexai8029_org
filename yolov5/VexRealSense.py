@@ -192,8 +192,9 @@ class VexRealSense:
                                 xmax = int(xyxy[2])
                                 ymax = int(xyxy[3])
                                 # Calculate width and height
-                                w = xmax - xmin
-                                h = ymax - ymin
+                                boxw = xmax - xmin
+                                boxh = ymax - ymin
+                                boxarea = boxw*boxh
 
                                 # Calculating measured centroid of the object (in Pixel)
                                 xc = int(round(((xmax + xmin) / 2), 0))
@@ -208,10 +209,11 @@ class VexRealSense:
                                 centerArr.append([xc, yc])
                                 
                                 c = int(cls)  # integer class
+                                print(conf)
+                                print(c)
                                 label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                                 plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
-                                if opt.save_crop:
-                                    save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+                                
                             
                             i-=1
                         
@@ -224,9 +226,9 @@ class VexRealSense:
                                 closest = depthArr[o]
 
                         #class id, confidence
-                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], 99)
+                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], int(conf))
                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                        detectRs.setBox(1, 1, 1, 1, 1, 1, depthArr[closestIndex], 1) 
+                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depthArr[closestIndex], boxarea) 
                         self.vexLogic.addDetectRealSense(detectRs)                       
                             
                     # Print time (inference + NMS)
