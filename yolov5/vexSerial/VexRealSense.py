@@ -31,6 +31,11 @@ class VexRealSense:
         return VexRealSense.__instance
 
     def startDetecting(self):
+        
+        detectRs = DetectRealSense.DetectRealSense(0, 99)
+        detectRs.setBox(1, 1, 1, 1, 1, 1, 1, 1)
+        self.vexLogic.addDetectRealSense(detectRs)      
+        
         """
         "TBD"
         logging.info("startDetecting")
