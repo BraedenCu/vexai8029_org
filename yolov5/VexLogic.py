@@ -42,6 +42,8 @@ class VexLogic:
     def setDetectInfo(self, detectRealSense):
         "Set up the DetectInfo based on RealSense info."
         
+        detectRealSense.display()
+        
         if self.numTargets == 0:
             logging.info("Setting numTargets to 1")
             self.numTargets = 1
@@ -99,9 +101,10 @@ class VexLogic:
                         self.detectInfo.displayBrief()
                     else:
                         logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
-
-            
-            
+     
+        self.detectInfo.displayBrief()
+        
+        
     def setInstances(self, vb, vf, vr):
         "TBD"
         logging.info("VexLogic.setInstances()")
