@@ -674,7 +674,8 @@ class VexBrain:
             try:
                 data = self.brain.readline()
                 print(data)
-                if data:
+                if data or True:
+                    print("got here")
                     self.msgRxCnt += 1
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
