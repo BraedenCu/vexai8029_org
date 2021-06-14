@@ -29,6 +29,8 @@ import zlib
 import logging
 import VexBrain 
 import DetectInfo
+import VexLogic
+import threading
 
 #is this needed?
 @torch.no_grad()
@@ -45,6 +47,11 @@ def consumer(in_q):
     brain = VexBrain.VexBrain.getInstance()
     brain.threadEntry()
     brain.startComm()
+    vexlogic = VexLogic.VexLogic
+    vexlogic.threadEntry()
+    vexlogic.brain = brain
+    
+    
     i = 0
     while True:
         if i%2 == 0:
@@ -83,6 +90,9 @@ def consumer(in_q):
             brain.addDetect(z)
             
             brain.createMsgFromDetectInfo()
+            
+            vexlogic.numTargets = 1
+            vexlogic.detectInfo = z
             
             
             #x = brain.FifoObjectBoxType(0)
