@@ -673,7 +673,7 @@ class VexBrain:
                 data = self.brain.readline()
                 if data:
                     self.msgRxCnt += 1
-                    logging.info("RX : %04d %s", self.msgRxCnt, data)
+                    #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
                         if self.detectInfo != None:
@@ -681,7 +681,7 @@ class VexBrain:
                             print("sending data")
                             packedMsg = self.mpt.getPackedMsg()
                             #if lastMsg != packedMsg:
-                            #    logging.info("TX : %s", packedMsg.hex())
+                            logging.info("TX : %s", packedMsg.hex())
                             self.brain.write(packedMsg)
                             self.msgTxCnt += 1
                             lastMsg = packedMsg
