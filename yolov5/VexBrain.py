@@ -670,10 +670,10 @@ class VexBrain:
         logging.info("VexBrain - Entering processing infinite loop")
         print("entering")
         while True:
-            print("entering")
             logging.info("try to send data")
             try:
                 data = self.brain.readline()
+                print(data)
                 if data:
                     self.msgRxCnt += 1
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
