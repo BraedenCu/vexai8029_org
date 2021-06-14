@@ -31,8 +31,8 @@ import VexBrain
 #is this needed?
 @torch.no_grad()
 
-#thread that produces data
 def producer(out_q):
+    #process that produces data
     while True:
         #run detection script, queue is updated within the detect script
         detect(0, 'runs/train/finpp/weights/last.pt', 0, 640, out_q)
@@ -46,6 +46,7 @@ def consumer(in_q):
     brain.threadEntry()
     brain.setTestData2()
     brain.startComm()
+    print(brain.setTestData2())
     while True:
         #initiate communication with brain
         #brain = VexBrain.VexBrain()
