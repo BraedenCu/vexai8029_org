@@ -206,29 +206,33 @@ class VexRealSense:
                                 
                                 #append depth in meters to center point
                                 depthArr.append(dataset.getdepth(xc, yc)) # Calculate depth
+                                
+                                #append to array containing centers of all detected balls
                                 centerArr.append([xc, yc])
                                 
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
+                                
+                                #add detections to detect realsense class
+                                #class id, confidence
+                                detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], conf)
+                                #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
+                                detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depthArr[closestIndex], boxarea) 
+                                self.vexLogic.addDetectRealSense(detectRs)  
             
                                 #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                                 #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                                 
-                            i-=1
+                            i-=1 #decrement
                         
                         #determine which ball is the closest
-                        closest = depthArr[0]    
-                        closestIndex = 0
-                        for o in range(1, len(depthArr)-1):
-                            if depthArr[o] <= closest:
-                                closestIndex = o
-                                closest = depthArr[o]
-
-                        #class id, confidence
-                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], conf)
-                        #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depthArr[closestIndex], boxarea) 
-                        self.vexLogic.addDetectRealSense(detectRs)                       
+                        #closest = depthArr[0]    
+                        #closestIndex = 0
+                        #for o in range(1, len(depthArr)-1):
+                        #    if depthArr[o] <= closest:
+                        #        closestIndex = o
+                        #        closest = depthArr[o]
+                   
                             
                     # Print time (inference + NMS)
                     print(f'{s}Done. ({t2 - t1:.3f}s)')
@@ -239,10 +243,10 @@ class VexRealSense:
                         cv2.imshow(str("hehe"), im0)
                         cv2.waitKey(1)  # 1 millisecond
 
-                    print(idArr)
+                    #print(idArr)
                     #print(centerArr)
                     #print(depthArr)
-                    print('\n')
+                    #print('\n')
                     
             """
             "TBD"
