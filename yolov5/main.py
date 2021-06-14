@@ -41,8 +41,10 @@ def producer(out_q):
         
 def consumer(in_q):
     #initiate communication with brain
-    brain = VexBrain.VexBrain()
+    brain = VexBrain.getInstance()
     brain.threadEntry()
+    brain.setTestData()
+    brain.startComm()
     while True:
         #initiate communication with brain
         #brain = VexBrain.VexBrain()
@@ -74,10 +76,10 @@ def consumer(in_q):
             brain.startComm()
             #vexBrain.sendData(brain, x)
         """    
-        brain.setTestData2()
-        brain.setTestData()
+        #brain.setTestData2()
+        
         #brain.createMsgFromDetectInfo()
-        brain.startComm()
+        
         
         #process data
         #print(data)
