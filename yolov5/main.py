@@ -66,9 +66,9 @@ def consumer(in_q):
             #also placeholder
             x.prob = 1
             packeddata = x.getPacked()
-            x.printVerbose()
+            brain.addData(packeddata)
             #data in unpacked format
-            brain.startComm(x)
+            brain.startComm()
             #vexBrain.sendData(brain, x)
             
         #process data

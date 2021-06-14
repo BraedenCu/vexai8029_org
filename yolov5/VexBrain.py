@@ -689,7 +689,7 @@ class VexBrain:
 
     def threadEntry(self):
         "Entry point for the VEX Brain Comm thread."
-        threading.current_thread().name = "tBrain"
+        #threading.current_thread().name = "tBrain"
         logging.info("")
         logging.info("-----------------------")
         logging.info("--- Thread starting ---")

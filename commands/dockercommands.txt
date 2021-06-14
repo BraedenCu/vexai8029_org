@@ -6,6 +6,7 @@ docker build -t vexai:0.1 .
 
 sudo docker run --gpus all -it --privileged vexai:0.1
 
+#THE ONE FOR RUNNING CONTAINERS
 sudo docker run --gpus all -it --privileged -v /dev:/dev -v /home/nano/Development/vexai8029_org:/usr/shared-dev yolov5:rs
 
 https://drive.google.com/file/d/1hJ2mb444mUlHpMsUpyxBMpbIxl38HDIZ/view
