@@ -194,6 +194,10 @@ class VexRealSense:
                             
                             # Add bbox to image
                             if view_img or True: 
+                                
+                                #add to count
+                                numTargets += 1
+                                
                                 # Splitting xyxy* (measurement)
                                 xmin = int(xyxy[0])
                                 ymin = int(xyxy[1])
@@ -223,12 +227,16 @@ class VexRealSense:
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
                                 
-                                #add detections to detect realsense class
-                                #class id, confidence
-                                detectRs = DetectRealSense.DetectRealSense(c, conf)
-                                #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                                detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                self.vexLogic.addDetectRealSense(detectRs)  
+                                #only process detection if the class is 0 (meaning red ball), 1 = blue ball
+                                if c == 0:
+                                    #only pursue if confidence is greater than 60%
+                                    if conf > 0.6: 
+                                        #add detections to detect realsense class
+                                        #class id, confidence
+                                        detectRs = DetectRealSense.DetectRealSense(c, conf)
+                                        #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
+                                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
+                                        self.vexLogic.addDetectRealSense(detectRs)  
             
                                 #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                                 #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
