@@ -75,6 +75,8 @@ ENV PYTHONPATH=/build/wrappers/python:/usr/local/lib
 
 RUN gdown https://drive.google.com/file/d/1hJ2mb444mUlHpMsUpyxBMpbIxl38HDIZ/view
 
-RUN pip3 install serial
+RUN python3.8 -m pip install serial
+
+RUN python3.8 -m pip install cupy-cuda102
 
 WORKDIR /usr/shared-dev
