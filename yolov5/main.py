@@ -16,10 +16,10 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 #for no gpu devices
-#from detectFunc import detect
+from detectFunc import detect
 #for gpu devices
-from detectFuncGPU import detect
-import cupy as cp
+#from detectFuncGPU import detect
+#import cupy as cp
 #vexaiBrainComm requirements
 import array
 import serial
