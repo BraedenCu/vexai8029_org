@@ -199,7 +199,7 @@ def detect(source, weights, view_img, imgsz, queue):
                 cv2.imshow(str("hehe"), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
-            print(ballArr)
+            print(idArr)
             #print(centerArr)
             #print(depthArr)
             print('\n')

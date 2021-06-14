@@ -76,7 +76,7 @@ def consumer(in_q):
         """    
         brain.setTestData2()
         brain.setTestData()
-        brain.createMsgFromDetectInfo()
+        #brain.createMsgFromDetectInfo()
         brain.startComm()
         
         #process data

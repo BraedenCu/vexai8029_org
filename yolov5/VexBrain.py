@@ -677,6 +677,7 @@ class VexBrain:
                     if (self.msgRxCnt % 1) == 0:
                         if self.detectInfo != None:
                             self.createMsgFromDetectInfo()
+                            print("sending data")
                             packedMsg = self.mpt.getPackedMsg()
                             #if lastMsg != packedMsg:
                             #    logging.info("TX : %s", packedMsg.hex())
