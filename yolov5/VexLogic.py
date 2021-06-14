@@ -133,8 +133,10 @@ class VexLogic:
     def updateBrain(self):
         "Send the VEX Cortex Brain the latest object position info."
         # TBD - LockGet()
+        print("updating brain")
         with self.lock:
             if self.numTargets == 0 or self.detectInfo == None:
+                print("brain has no targets")
                 self.brain.setNoTargets()
             else:
                 self.detectInfo.display()

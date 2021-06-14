@@ -246,7 +246,7 @@ class VexRealSense:
                    
                             
                     # Print time (inference + NMS)
-                    print(f'{s}Done. ({t2 - t1:.3f}s)')
+                    #print(f'{s}Done. ({t2 - t1:.3f}s)')
                     
 
                     # Stream results
@@ -255,7 +255,7 @@ class VexRealSense:
                         cv2.waitKey(1)  # 1 millisecond
 
                     #print(idArr)
-                    print(centerArr)
+                    #print(centerArr)
                     #print(depthArr)
                     print('\n')
                     
