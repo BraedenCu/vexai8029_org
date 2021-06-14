@@ -44,7 +44,7 @@ def consumer(in_q):
     brain = VexBrain.VexBrain
     brain = brain.getInstance()
     brain.threadEntry()
-    brain.setTestData()
+    brain.setTestData2()
     brain.startComm()
     while True:
         #initiate communication with brain
