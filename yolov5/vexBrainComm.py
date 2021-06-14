@@ -493,30 +493,30 @@ def initiateControlLoop():
 
         #mpt = MapPacketType()
 
+    """
+    msgRxCnt = 0
+    while True:
+        try:
+            dataReceived = brain.readline()
+            if dataReceived:
+                msgRxCnt += 1
+                #print("RX :", data)
+                #if (msgRxCnt % 10) == 0:
+                if (msgRxCnt % 1) == 0:
+                    mpt.reset()
+                    mpt.setTestData()
+                    #mpt.printVerbose()
+                    #mpt.printTerse()
+                    #print("")
+                    packedMsg = mpt.getPackedMsg()
+                    #print("")
+                    printHex(packedMsg)
+                    brain.write(packedMsg)
+                    #break
+                    
+        except:
+            break
         """
-        msgRxCnt = 0
-        while True:
-            try:
-                dataReceived = brain.readline()
-                if dataReceived:
-                    msgRxCnt += 1
-                    #print("RX :", data)
-                    #if (msgRxCnt % 10) == 0:
-                    if (msgRxCnt % 1) == 0:
-                        mpt.reset()
-                        mpt.setTestData()
-                        #mpt.printVerbose()
-                        #mpt.printTerse()
-                        #print("")
-                        packedMsg = mpt.getPackedMsg()
-                        #print("")
-                        printHex(packedMsg)
-                        brain.write(packedMsg)
-                        #break
-                        
-            except:
-                break
-            """
             
             #brain.close()
     #except:
