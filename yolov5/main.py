@@ -46,8 +46,14 @@ def consumer(in_q):
     brain.threadEntry()
     brain.setTestData2()
     brain.startComm()
-    print(brain.setTestData2())
+    i = 0
     while True:
+        if i%2 == 0:
+            brain.setTestData3()
+        else:
+            brain.setTestData4()
+        
+        i+=1
         #initiate communication with brain
         #brain = VexBrain.VexBrain()
         #brain.threadEntry()
