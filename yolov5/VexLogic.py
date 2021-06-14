@@ -95,7 +95,6 @@ class VexLogic:
                 else:
                     logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
 
-            logging.info("---BROSKI--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD) #debugging random
             
             
     def setInstances(self, vb, vf, vr):
