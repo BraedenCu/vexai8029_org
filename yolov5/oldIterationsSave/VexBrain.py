@@ -573,7 +573,8 @@ class VexBrain:
 
     def setTestData2(self):
         "Set up test data, for debugging protocol with Brain."
-        #logging.info("setTestData2 - Enter")
+        print("setting up test data")
+        logging.info("setTestData2 - Enter")
         self.mpt.map.boxnum                    = 2
         self.mpt.map.mapnum                    = 1
         self.mpt.map.posRecord.framecnt        = 9
@@ -606,7 +607,7 @@ class VexBrain:
         self.mpt.map.mapObjs[0].positionX      = 3.1
         self.mpt.map.mapObjs[0].positionY      = 2.2
         self.mpt.map.mapObjs[0].positionZ      = 1.3
-        #logging.info("setTestData2 - Exit")
+        logging.info("setTestData2 - Exit")
 
     def setTestData3(self):
         "Set up test data, for debugging protocol with Brain."
@@ -668,28 +669,31 @@ class VexBrain:
 
         logging.info("VexBrain - Entering processing infinite loop")
         while True:
+            #logging.info("try to send data")
             try:
                 data = self.brain.readline()
-                if data:
+                if data or True:
                     self.msgRxCnt += 1
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
-                        if self.detectInfo != None:
+                        if self.detectInfo != None or True == True:
                             self.createMsgFromDetectInfo()
+                            print("sending data")
                             packedMsg = self.mpt.getPackedMsg()
                             #if lastMsg != packedMsg:
-                            #    logging.info("TX : %s", packedMsg.hex())
+                            logging.info("TX : %s", packedMsg.hex())
                             self.brain.write(packedMsg)
                             self.msgTxCnt += 1
                             lastMsg = packedMsg
                             #break
             except:
+                logging.info("  failed sadge")
                 break
 
     def threadEntry(self):
         "Entry point for the VEX Brain Comm thread."
-        threading.current_thread().name = "tBrain"
+        #threading.current_thread().name = "tBrain"
         logging.info("")
         logging.info("-----------------------")
         logging.info("--- Thread starting ---")
@@ -706,4 +710,3 @@ class VexBrain:
         logging.info("--- Thread finishing ---")
         logging.info("------------------------")
         logging.info("")
-

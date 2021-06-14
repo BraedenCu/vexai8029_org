@@ -4,8 +4,6 @@ import time
 import VexConfig
 import VexBrain
 import DetectInfo
-import DetectRealSense
-import FlirPosInfo
 
 format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
@@ -135,4 +133,3 @@ class VexLogic:
                 #self.detectInfo.display()
                 #self.detectInfo.displayBrief()
                 self.brain.addDetect(self.detectInfo)
-

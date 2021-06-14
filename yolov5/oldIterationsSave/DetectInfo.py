@@ -45,4 +45,3 @@ class DetectInfo:
         self.height    = height
         self.area      = area
         self.distance  = distance
-
