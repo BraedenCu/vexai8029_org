@@ -6,7 +6,7 @@ import threading
 import time
 import zlib
 import VexConfig
-#import DetectInfo
+import DetectInfo
 
 format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
@@ -670,7 +670,7 @@ class VexBrain:
         logging.info("VexBrain - Entering processing infinite loop")
         print("entering")
         while True:
-            logging.info("try to send data")
+            #logging.info("try to send data")
             try:
                 data = self.brain.readline()
                 print(data)
@@ -680,7 +680,7 @@ class VexBrain:
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
-                        if self.detectInfo != None:
+                        if self.detectInfo != None or True == True:
                             self.createMsgFromDetectInfo()
                             print("sending data")
                             packedMsg = self.mpt.getPackedMsg()
