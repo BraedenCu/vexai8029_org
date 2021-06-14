@@ -149,6 +149,10 @@ class VexRealSense:
                 idArr = []
                 centerArr = []
                 depthArr = []
+                
+                numDetections = 0
+                numTargets = 0
+                
                 # detections per image
                 for i, det in enumerate(pred):  
                     if webcam:  # batch_size >= 1
@@ -181,6 +185,9 @@ class VexRealSense:
                         # Write results
                         #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
                         for *xyxy, conf, cls in reversed(det):
+                            
+                            numDetections+=1
+                            
                             #add id of detected object to array
                             idArr.append(detectionIDsNumpy[i])
                             
@@ -205,7 +212,8 @@ class VexRealSense:
                                 #meas_pixel = [xc_msr, yc_msr]
                                 
                                 #depth in meters to center point
-                                depth = dataset.getdepth(xc, yc) # Calculate depth
+                                depthMeters = dataset.getdepth(xc, yc) # Calculate depth
+                                depth = depthMeters*1000 #convert to milimeters
                                 depthArr.append(depth) #for debugging
                                 
                                 #append to array containing centers of all detected balls
