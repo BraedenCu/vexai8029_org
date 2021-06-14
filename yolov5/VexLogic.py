@@ -41,6 +41,7 @@ class VexLogic:
 
     def setDetectInfo(self, detectRealSense):
         "Set up the DetectInfo based on RealSense info."
+        
         if self.numTargets == 0:
             #logging.info("Setting numTargets to 1")
             self.numTargets = 1
@@ -94,6 +95,9 @@ class VexLogic:
                 else:
                     logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
 
+            logging.info("---BROSKI--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD) #debugging random
+            
+            
     def setInstances(self, vb, vf, vr):
         "TBD"
         logging.info("VexLogic.setInstances()")
@@ -115,9 +119,9 @@ class VexLogic:
         logging.info("")
         
         logging.info("VexLogic - Entering processing infinite loop")
-        while True:
-            time.sleep(0.2)
-            self.updateBrain()
+        #while True:
+        time.sleep(0.2)
+        self.updateBrain()
 
         logging.info("")
         logging.info("------------------------")
