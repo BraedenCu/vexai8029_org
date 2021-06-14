@@ -75,4 +75,6 @@ ENV PYTHONPATH=/build/wrappers/python:/usr/local/lib
 
 RUN gdown https://drive.google.com/file/d/1hJ2mb444mUlHpMsUpyxBMpbIxl38HDIZ/view
 
+RUN pip3 install serial
+
 WORKDIR /yolov5
