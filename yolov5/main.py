@@ -44,7 +44,6 @@ def consumer(in_q):
     brain = VexBrain.VexBrain.geInstance()
     brain.threadEntry()
     brain.setTestData2()
-    brain.startComm()
     i = 0
     while True:
         if i%2 == 0:

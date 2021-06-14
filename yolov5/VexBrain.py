@@ -668,7 +668,9 @@ class VexBrain:
         lastMsg = None
 
         logging.info("VexBrain - Entering processing infinite loop")
+        print("entering")
         while True:
+            print("entering")
             logging.info("try to send data")
             try:
                 data = self.brain.readline()
