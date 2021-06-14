@@ -52,10 +52,10 @@ class VexLogic:
             self.detectInfo = DetectInfo.DetectInfo(detectRealSense.classId, detectRealSense.confidence)
         else:
             #prevents error that occours when bugged balls are detected with depth 0
-            print("runningthis")
+            #print("runningthis")
             if detectRealSense.distance != 0:
                 if detectRealSense.width != 0:
-                    print("ran this")
+                    #print("ran this")
                     self.detectInfo.confidence = detectRealSense.confidence
                     self.detectInfo.left       = detectRealSense.left
                     self.detectInfo.top        = detectRealSense.top
@@ -145,7 +145,7 @@ class VexLogic:
                 print("brain has no targets")
                 self.brain.setNoTargets()
             else:
-                self.detectInfo.display()
+                #self.detectInfo.display()
                 #self.detectInfo.displayBrief()
                 self.brain.addDetect(self.detectInfo)
 
