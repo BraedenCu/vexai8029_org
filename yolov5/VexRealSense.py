@@ -27,7 +27,6 @@ format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 
 #------------------------------------------------------------------------------
-#//MASSIVESTINKYHEADPLUSTHICKYNOSE
 
 class VexRealSense:
     "TBD"
@@ -254,7 +253,7 @@ class VexRealSense:
                         cv2.imshow(str("hehe"), im0)
                         cv2.waitKey(1)  # 1 millisecond
 
-                    #print(idArr)
+                    print(idArr)
                     #print(centerArr)
                     #print(depthArr)
                     print('\n')
