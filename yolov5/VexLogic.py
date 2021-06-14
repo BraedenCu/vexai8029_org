@@ -53,8 +53,8 @@ class VexLogic:
         else:
             #prevents error that occours when bugged balls are detected with depth 0
             print("runningthis")
-            if self.detectInfo.distance != 0:
-                if self.detectInfo.width == 0 or True:
+            if detectRealSense.distance != 0:
+                if detectRealSense.width != 0:
                     print("ran this")
                     self.detectInfo.confidence = detectRealSense.confidence
                     self.detectInfo.left       = detectRealSense.left
