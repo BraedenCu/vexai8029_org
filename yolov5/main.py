@@ -28,6 +28,7 @@ import time
 import zlib
 import logging
 import VexBrain 
+import DetectInfo
 
 #is this needed?
 @torch.no_grad()
@@ -43,7 +44,7 @@ def consumer(in_q):
     #initiate communication with brain
     brain = VexBrain.VexBrain.getInstance()
     brain.threadEntry()
-    brain.setTestData2()
+    brain.startComm()
     i = 0
     while True:
         if i%2 == 0:
@@ -62,28 +63,44 @@ def consumer(in_q):
         
         #get data
         data = in_q.get()
-        """
+        
         if len(data) >= 0:
-            #params: x, y, width, height, 
-            x = brain.FifoObjectBoxType(0)
-            x.x = data[0][0]
-            x.y = data[0][1]
-            x.depth = data[1]
-            x.classId = int(data[2])
+            #params: id, probability
             #not actual values, just placeholders (NEED TO BE ACCOUNTED FOR LATER TO ACCOUNT FOR BALLS IN GOALS. IE, FIGURE OUT RATIO OF WIDTH TO 
             #HEIGHT, AND IF IT IS NOT NEAR 1:1, THEN DISCARD IT)
-            x.width = 1
-            x.height = 1
+            z = DetectInfo.DetectInfo(int(data[2]), 99)
+            
+            z.distance = data[1]
+            z.top = 1
+            z.right = 1
+            z.bottom = 1
+            z.width = 1
+            z.height = 1
+            z.area = 1
+            
+            z.displayBrief()
+            
+            brain.addDetect(z)
+            
+            brain.createMsgFromDetectInfo()
+            
+            
+            #x = brain.FifoObjectBoxType(0)
+            #x.x = data[0][0]
+            #x.y = data[0][1]
+            #x.depth = data[1]
+            #x.classId = int(data[2])
+            #not actual values, just placeholders (NEED TO BE ACCOUNTED FOR LATER TO ACCOUNT FOR BALLS IN GOALS. IE, FIGURE OUT RATIO OF WIDTH TO 
+            #HEIGHT, AND IF IT IS NOT NEAR 1:1, THEN DISCARD IT)
+            #x.width = 1
+            #x.height = 1
             #also placeholder
-            x.prob = 1
-            packeddata = x.getPacked()
-            brain.addData(packeddata)
+            #x.prob = 1
+            #packeddata = x.getPacked()
+            #brain.addData(packeddata)
             #data in unpacked format
-            brain.startComm()
             #vexBrain.sendData(brain, x)
-        """    
-        #brain.setTestData2()
-        
+                
         #brain.createMsgFromDetectInfo()
         
         
