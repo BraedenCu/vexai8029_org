@@ -41,7 +41,7 @@ def producer(out_q):
         
 def consumer(in_q):
     #initiate communication with brain
-    brain = VexBrain.VexBrain.geInstance()
+    brain = VexBrain.VexBrain.getInstance()
     brain.threadEntry()
     brain.setTestData2()
     i = 0
