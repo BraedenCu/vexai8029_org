@@ -224,7 +224,7 @@ class VexRealSense:
                                 closest = depthArr[o]
 
                         #class id, confidence
-                        detectRs = DetectRealsense.DetectRealsense(idArr[closestIndex], 99)
+                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], 99)
                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                         detectRs.setBox(1, 1, 1, 1, 1, 1, depthArr[closestIndex], 1) 
                         self.vexLogic.addDetectRealSense(detectRs)                       
