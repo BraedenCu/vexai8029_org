@@ -27,6 +27,8 @@ format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 
 #------------------------------------------------------------------------------
+#//MASSIVESTINKYHEADPLUSTHICKYNOSE
+
 class VexRealSense:
     "TBD"
     __instance = None
