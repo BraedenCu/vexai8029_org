@@ -573,7 +573,7 @@ class VexBrain:
 
     def setTestData2(self):
         "Set up test data, for debugging protocol with Brain."
-        #logging.info("setTestData2 - Enter")
+        logging.info("setTestData2 - Enter")
         self.mpt.map.boxnum                    = 2
         self.mpt.map.mapnum                    = 1
         self.mpt.map.posRecord.framecnt        = 9
