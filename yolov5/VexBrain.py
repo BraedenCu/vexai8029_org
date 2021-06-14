@@ -669,6 +669,7 @@ class VexBrain:
 
         logging.info("VexBrain - Entering processing infinite loop")
         while True:
+            logging.info("try to send data")
             try:
                 data = self.brain.readline()
                 if data:
@@ -687,6 +688,7 @@ class VexBrain:
                             lastMsg = packedMsg
                             #break
             except:
+                logging.info("  failed sadge")
                 break
 
     def threadEntry(self):

@@ -26,11 +26,11 @@ import serial
 import struct
 import time
 import zlib
+import logging
 import VexBrain 
 
 #is this needed?
 @torch.no_grad()
-
 def producer(out_q):
     #process that produces data
     while True:
@@ -41,8 +41,7 @@ def producer(out_q):
         
 def consumer(in_q):
     #initiate communication with brain
-    brain = VexBrain.VexBrain
-    brain = brain.getInstance()
+    brain = VexBrain.VexBrain.geInstance()
     brain.threadEntry()
     brain.setTestData2()
     brain.startComm()
