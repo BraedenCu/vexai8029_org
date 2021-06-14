@@ -179,13 +179,13 @@ class VexRealSense:
                         i = detectionIDsNumpy.size - 1
                         
                         # Write results
+                        #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
                         for *xyxy, conf, cls in reversed(det):
                             #add id of detected object to array
                             idArr.append(detectionIDsNumpy[i])
                             
                             # Add bbox to image
-                            if save_img or opt.save_crop or view_img or True:  # Add bbox to image
-                                # Calculate depth
+                            if view_img or True: 
                                 # Splitting xyxy* (measurement)
                                 xmin = int(xyxy[0])
                                 ymin = int(xyxy[1])
@@ -205,16 +205,15 @@ class VexRealSense:
                                 #meas_pixel = [xc_msr, yc_msr]
                                 
                                 #append depth in meters to center point
-                                depthArr.append(dataset.getdepth(xc, yc)) 
+                                depthArr.append(dataset.getdepth(xc, yc)) # Calculate depth
                                 centerArr.append([xc, yc])
                                 
-                                c = int(cls)  # integer class
-                                print(conf)
-                                print(c)
-                                label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
-                                plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
+                                # integer class (label either 0 or 1)
+                                c = int(cls) 
+            
+                                #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
+                                #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                                 
-                            
                             i-=1
                         
                         #determine which ball is the closest
@@ -226,7 +225,7 @@ class VexRealSense:
                                 closest = depthArr[o]
 
                         #class id, confidence
-                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], int(conf))
+                        detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], conf)
                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depthArr[closestIndex], boxarea) 
                         self.vexLogic.addDetectRealSense(detectRs)                       
