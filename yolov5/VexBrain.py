@@ -606,7 +606,7 @@ class VexBrain:
         self.mpt.map.mapObjs[0].positionX      = 3.1
         self.mpt.map.mapObjs[0].positionY      = 2.2
         self.mpt.map.mapObjs[0].positionZ      = 1.3
-        #logging.info("setTestData2 - Exit")
+        logging.info("setTestData2 - Exit")
 
     def setTestData3(self):
         "Set up test data, for debugging protocol with Brain."
@@ -672,7 +672,7 @@ class VexBrain:
                 data = self.brain.readline()
                 if data:
                     self.msgRxCnt += 1
-                    #logging.info("RX : %04d %s", self.msgRxCnt, data)
+                    logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
                         if self.detectInfo != None:
