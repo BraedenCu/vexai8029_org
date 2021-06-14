@@ -204,20 +204,21 @@ class VexRealSense:
                                 #yc_msr = float((xyxy[3] + xyxy[1])/2)
                                 #meas_pixel = [xc_msr, yc_msr]
                                 
-                                #append depth in meters to center point
-                                depthArr.append(dataset.getdepth(xc, yc)) # Calculate depth
+                                #depth in meters to center point
+                                depth = dataset.getdepth(xc, yc) # Calculate depth
+                                depthArr.append(depth) #for debugging
                                 
                                 #append to array containing centers of all detected balls
-                                centerArr.append([xc, yc])
+                                centerArr.append([xc, yc]) # for debugging
                                 
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
                                 
                                 #add detections to detect realsense class
                                 #class id, confidence
-                                detectRs = DetectRealSense.DetectRealSense(idArr[closestIndex], conf)
+                                detectRs = DetectRealSense.DetectRealSense(c, conf)
                                 #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                                detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depthArr[closestIndex], boxarea) 
+                                detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
                                 self.vexLogic.addDetectRealSense(detectRs)  
             
                                 #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
