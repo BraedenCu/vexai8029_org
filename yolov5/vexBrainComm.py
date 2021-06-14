@@ -483,11 +483,11 @@ def sendData(brain, data):
 
 def initiateControlLoop():
     print("contrl loop")
-    try:
-        print("got here")
-        brain = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-        print("successfully connected to brain")
-        return brain
+    #try:
+    print("got here")
+    brain = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
+    print("successfully connected to brain")
+    return brain
         # VEX Brain request for data (it sends ASCII data currently):
         #     b'AA55CC3301\r\n'
 
@@ -519,9 +519,9 @@ def initiateControlLoop():
             """
             
             #brain.close()
-    except:
-        print("***ERROR***; Couldn't open /dev/ttyACM1")
-        return 0
+    #except:
+    #    print("***ERROR***; Couldn't open /dev/ttyACM1")
+    #    return 0
 
 
 print("")
