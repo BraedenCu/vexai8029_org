@@ -191,7 +191,7 @@ def detect(source, weights, view_img, imgsz, queue):
                     
                     
             # Print time (inference + NMS)
-            #print(f'{s}Done. ({t2 - t1:.3f}s)')
+            print(f'{s}Done. ({t2 - t1:.3f}s)')
             
 
             # Stream results
@@ -202,7 +202,7 @@ def detect(source, weights, view_img, imgsz, queue):
             #print(ballArr)
             #print(centerArr)
             #print(depthArr)
-            #print('\n')
+            print('\n')
             
             
             # Stream results
