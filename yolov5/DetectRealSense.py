@@ -23,7 +23,7 @@ class DetectRealSense:
 
     def display(self):
         "Display contents of the current object."
-        logging.info("ID:%2d, L:%5.1f, T:%5.1f, R:%5.1f, B:%5.1f, W:%5.1f, H:%5.1f, D:%5.1f, A:%9.1f, C:%3.1f", self.classId, self.left, self.top, self.right, self.bottom, self.width, self.height, self.distance, self.area, self.confidence)
+        #logging.info("ID:%2d, L:%5.1f, T:%5.1f, R:%5.1f, B:%5.1f, W:%5.1f, H:%5.1f, D:%5.1f, A:%9.1f, C:%3.1f", self.classId, self.left, self.top, self.right, self.bottom, self.width, self.height, self.distance, self.area, self.confidence)
 
 
     def setBox(self, left, top, right, bottom, width, height, distance, area):
