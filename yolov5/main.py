@@ -20,13 +20,13 @@ from detectFunc import detect
 #for gpu devices
 #from detectFuncGPU import detect
 #import cupy as cp
-#vexaiBrainComm requirements
+#vexaiBrain requirements
 import array
 import serial
 import struct
 import time
 import zlib
-import vexBrainComm 
+import vexBrain 
 
 #is this needed?
 @torch.no_grad()
@@ -42,18 +42,19 @@ def producer(out_q):
 def consumer(in_q):
     while True:
         #initiate communication with brain
-        brain = vexBrainComm.initiateControlLoop()
+        brain = vexBrain.vexBrain
+        brain.threadEntry()
         
-        if brain == 0:
-            print("brain is not connected")
-            break
+        #if brain == 0:
+        #    print("brain is not connected")
+        #    break
         
         #get data
         data = in_q.get()
         
         if len(data) >= 0:
             #params: x, y, width, height, 
-            x = vexBrainComm.FifoObjectBoxType(0)
+            x = brain.FifoObjectBoxType(0)
             x.x = data[0][0]
             x.y = data[0][1]
             x.depth = data[1]
@@ -67,7 +68,8 @@ def consumer(in_q):
             packeddata = x.getPacked()
             x.printVerbose()
             #data in unpacked format
-            vexBrainComm.sendData(brain, x)
+            brain.startComm(x)
+            #vexBrain.sendData(brain, x)
             
         #process data
         #print(data)
