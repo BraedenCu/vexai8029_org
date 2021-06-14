@@ -26,7 +26,7 @@ import serial
 import struct
 import time
 import zlib
-import vexBrain 
+import VexBrain 
 
 #is this needed?
 @torch.no_grad()
@@ -42,7 +42,7 @@ def producer(out_q):
 def consumer(in_q):
     while True:
         #initiate communication with brain
-        brain = vexBrain.vexBrain
+        brain = VexBrain.VexBrain
         brain.threadEntry()
         
         #if brain == 0:
