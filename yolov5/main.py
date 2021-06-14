@@ -42,7 +42,7 @@ def producer(out_q):
 def consumer(in_q):
     while True:
         #initiate communication with brain
-        brain = VexBrain.VexBrain
+        brain = VexBrain.VexBrain()
         brain.threadEntry()
         
         #if brain == 0:
