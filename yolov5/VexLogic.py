@@ -50,7 +50,7 @@ class VexLogic:
         else:
             #prevents error that occours when bugged balls are detected with depth 0
             if self.detectInfo.distance != 0:
-                if self.detectInfo.width == 0:
+                if self.detectInfo.width == 0 or True:
                     self.detectInfo.confidence = detectRealSense.confidence
                     self.detectInfo.left       = detectRealSense.left
                     self.detectInfo.top        = detectRealSense.top
@@ -133,7 +133,6 @@ class VexLogic:
     def updateBrain(self):
         "Send the VEX Cortex Brain the latest object position info."
         # TBD - LockGet()
-        print("updating brain")
         with self.lock:
             if self.numTargets == 0 or self.detectInfo == None:
                 print("brain has no targets")
