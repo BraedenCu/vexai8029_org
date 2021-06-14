@@ -6,7 +6,7 @@ import threading
 import time
 import zlib
 import VexConfig
-import DetectInfo
+#import DetectInfo
 
 format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
