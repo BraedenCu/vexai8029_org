@@ -1,3 +1,14 @@
+# THE PROCESS
+ssh nano@192.168.86.32  
+cd Development/vexai8029_org   # this directory is used as a docker volume when the docker container is run 
+git pull origin main  # get the most recent updates from this repo  
+sudo docker run --gpus all -it --privileged -v /dev:/dev -v /home/nano/Development/vexai8029_org:/usr/shared-dev yolov5:rs  
+# now you are in the docker container, run the following commands:  
+pip3 install pyserial  
+cd /usr/yolov5  
+python3 VexAiJetson.py #to launch file  
+
+
 # Vex-AI-2021-Code
 
 Setting up ssh on the vex administered jetson: sudo nano /etc/NetworkManager/NetworkManager.conf then change managed=false to managed=true sudo service network-manager restart then connect to wifi, safe ip, and ssh.
