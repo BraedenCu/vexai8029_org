@@ -194,6 +194,7 @@ class VexRealSense:
                         #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
                         logging.info("iterating over each detection")
                         for *xyxy, conf, cls in reversed(det):
+                            logging.info("iterated over detection")
                             
                             numDetections+=1
                             
