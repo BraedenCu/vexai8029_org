@@ -505,7 +505,7 @@ class VexBrain:
             self.numTargets = 1
         if self.detectInfo == None:
             self.detectInfo = detectInfo
-            self.detectInfo.display()
+            #self.detectInfo.display()
 
     def addMap(self):
         "TBD"
@@ -677,6 +677,7 @@ class VexBrain:
                     #if (self.msgRxCnt % 1) == 0:
                     if self.detectInfo != None:
                         self.createMsgFromDetectInfo()
+                        self.detectInfo.displayBrief()
                         packedMsg = self.mpt.getPackedMsg()
                         #if lastMsg != packedMsg:
                         #    logging.info("TX : %s", packedMsg.hex())
