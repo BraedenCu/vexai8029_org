@@ -183,9 +183,11 @@ class VexRealSense:
                         #    n = (det[:, -1] == c).sum()  # detections per class
                         #    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string            
                         
+                        logging.info("started copy of tensor")
                         detNumCPU = det.cpu()
                         detectionIDsNumpy = detNumCPU[:, -1].numpy()
                         i = detectionIDsNumpy.size - 1
+                        logging.info("finished copy of tensor")
                         
                         # Write results
                         #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
