@@ -50,9 +50,11 @@ class VexRealSense:
     def startDetecting(self):
         
         while (True):
-            detectRs = DetectRealSense.DetectRealSense(0, 99)
-            detectRs.setBox(1, 1, 1, 1, 1, 1, 1, 1)
-            self.vexLogic.addDetectRealSense(detectRs)      
+            logging.info("start detect loop")
+            
+            #detectRs = DetectRealSense.DetectRealSense(0, 99)
+            #detectRs.setBox(1, 1, 1, 1, 1, 1, 1, 1)
+            #self.vexLogic.addDetectRealSense(detectRs)      
             
             parser = argparse.ArgumentParser()
             parser.add_argument('--weights', nargs='+', type=str, default='runs/train/pp3/weights/last.pt', help='model.pt path(s)')
@@ -126,6 +128,7 @@ class VexRealSense:
                 model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
             t0 = time.time()
             
+            logging.info("before dataset loop")
             for path, img, im0s in dataset:
                 img = torch.from_numpy(img).to(device)
                 img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -154,6 +157,7 @@ class VexRealSense:
                 numDetections = 0
                 numTargets = 0
                 
+                logging.info("iterating over predictions")
                 # detections per image
                 for i, det in enumerate(pred):  
                     if webcam:  # batch_size >= 1
@@ -185,6 +189,7 @@ class VexRealSense:
                         
                         # Write results
                         #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
+                        logging.info("iterating over each detection")
                         for *xyxy, conf, cls in reversed(det):
                             
                             numDetections+=1
