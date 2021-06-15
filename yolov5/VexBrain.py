@@ -674,16 +674,16 @@ class VexBrain:
                     self.msgRxCnt += 1
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
-                    if (self.msgRxCnt % 1) == 0:
-                        if self.detectInfo != None:
-                            self.createMsgFromDetectInfo()
-                            packedMsg = self.mpt.getPackedMsg()
-                            #if lastMsg != packedMsg:
-                            #    logging.info("TX : %s", packedMsg.hex())
-                            self.brain.write(packedMsg)
-                            self.msgTxCnt += 1
-                            lastMsg = packedMsg
-                            #break
+                    #if (self.msgRxCnt % 1) == 0:
+                    if self.detectInfo != None:
+                        self.createMsgFromDetectInfo()
+                        packedMsg = self.mpt.getPackedMsg()
+                        #if lastMsg != packedMsg:
+                        #    logging.info("TX : %s", packedMsg.hex())
+                        self.brain.write(packedMsg)
+                        self.msgTxCnt += 1
+                        lastMsg = packedMsg
+                        #break
             except:
                 break
 
