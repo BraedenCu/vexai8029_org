@@ -67,7 +67,7 @@ class VexLogic:
                     self.detectInfo.distance   = detectRealSense.distance
                     self.detectInfo.area       = detectRealSense.area
                     #print(self.detectInfo.distance)
-                    #self.detectInfo.displayBrief()
+                    self.detectInfo.displayBrief()
                 else:
                     resultW = 0.0
                     resultH = 0.0
