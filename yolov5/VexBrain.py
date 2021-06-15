@@ -505,7 +505,7 @@ class VexBrain:
             self.numTargets = 1
         if self.detectInfo == None:
             self.detectInfo = detectInfo
-            #self.detectInfo.display()
+            self.detectInfo.display()
 
     def addMap(self):
         "TBD"
