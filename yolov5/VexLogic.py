@@ -130,7 +130,7 @@ class VexLogic:
         
         logging.info("VexLogic - Entering processing infinite loop")
         while True:
-            #time.sleep(0.2)
+            time.sleep(0.01)
             self.updateBrain()
 
         logging.info("")
@@ -144,7 +144,7 @@ class VexLogic:
         # TBD - LockGet()
         with self.lock:
             if self.numTargets == 0 or self.detectInfo == None:
-                print("brain has no targets")
+                #print("brain has no targets")
                 self.brain.setNoTargets()
             else:
                 #self.detectInfo.display()
