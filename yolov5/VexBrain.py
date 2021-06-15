@@ -517,7 +517,7 @@ class VexBrain:
 
     def createMsgFromDetectInfo(self):
         "Build a message to send to the VEX Cortex Brain, based on detect info."
-        #logging.info("createMsgFromDetectInfo - Enter")
+        logging.info("createMsgFromDetectInfo - Enter")
         self.clearMsg()
         #self.setTestData2()
         #self.setTestData3()
@@ -678,8 +678,8 @@ class VexBrain:
                     if self.detectInfo != None:
                         self.createMsgFromDetectInfo()
                         packedMsg = self.mpt.getPackedMsg()
-                        #if lastMsg != packedMsg:
-                        #    logging.info("TX : %s", packedMsg.hex())
+                        if lastMsg != packedMsg:
+                            logging.info("TX : %s", packedMsg.hex())
                         self.brain.write(packedMsg)
                         self.msgTxCnt += 1
                         lastMsg = packedMsg
