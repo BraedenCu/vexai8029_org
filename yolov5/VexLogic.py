@@ -128,7 +128,7 @@ class VexLogic:
         
         logging.info("VexLogic - Entering processing infinite loop")
         while True:
-            time.sleep(0.2)
+            #time.sleep(0.2)
             self.updateBrain()
 
         logging.info("")
