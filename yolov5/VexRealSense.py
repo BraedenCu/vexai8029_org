@@ -238,11 +238,11 @@ class VexRealSense:
                                     if conf > 0.7:
                                         #add detections to detect realsense class
                                         #class id, confidence
-                                        #detectRs = DetectRealSense.DetectRealSense(c, conf)
+                                        detectRs = DetectRealSense.DetectRealSense(c, conf)
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                                        #detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        #self.vexLogic.addDetectRealSense(detectRs) 
-                                        pass 
+                                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
+                                        self.vexLogic.addDetectRealSense(detectRs) 
+                                         
             
                                 #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                                 #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
