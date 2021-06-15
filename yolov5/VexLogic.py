@@ -49,7 +49,6 @@ class VexLogic:
             self.numTargets = 1
             
         if self.detectInfo == None:
-            #print("ran this sad")
             self.detectInfo = DetectInfo.DetectInfo(detectRealSense.classId, detectRealSense.confidence)
         else:
             #prevents error that occours when bugged balls are detected with depth 0
@@ -105,7 +104,7 @@ class VexLogic:
                     else:
                         logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
      
-        self.detectInfo.displayBrief()
+        #self.detectInfo.displayBrief()
         
         
     def setInstances(self, vb, vf, vr):
