@@ -230,7 +230,7 @@ class VexRealSense:
                                 #only process detection if the class is 0 (meaning red ball), 1 = blue ball
                                 if c == 0:
                                     #only pursue if confidence is greater than 60%
-                                    if conf > 0.6:
+                                    if conf > 0.1:
                                         #add detections to detect realsense class
                                         #class id, confidence
                                         detectRs = DetectRealSense.DetectRealSense(c, conf)
