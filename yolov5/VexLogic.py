@@ -54,20 +54,21 @@ class VexLogic:
             #prevents error that occours when bugged balls are detected with depth 0
             #print("runningthis")
             if detectRealSense.distance != 0:
-                if self.detectInfo.width == 0:
-                    #if detectRealSense.width != 0:
-                    #print("ran this")
-                    self.detectInfo.confidence = detectRealSense.confidence
-                    self.detectInfo.left       = detectRealSense.left
-                    self.detectInfo.top        = detectRealSense.top
-                    self.detectInfo.right      = detectRealSense.right
-                    self.detectInfo.bottom     = detectRealSense.bottom
-                    self.detectInfo.width      = detectRealSense.width
-                    self.detectInfo.height     = detectRealSense.height
-                    self.detectInfo.distance   = detectRealSense.distance
-                    self.detectInfo.area       = detectRealSense.area
-                    #print(self.detectInfo.distance)
-                    self.detectInfo.displayBrief()
+                #if self.detectInfo.width == 0:
+                #if detectRealSense.width != 0:
+                #print("ran this")
+                self.detectInfo.confidence = detectRealSense.confidence
+                self.detectInfo.left       = detectRealSense.left
+                self.detectInfo.top        = detectRealSense.top
+                self.detectInfo.right      = detectRealSense.right
+                self.detectInfo.bottom     = detectRealSense.bottom
+                self.detectInfo.width      = detectRealSense.width
+                self.detectInfo.height     = detectRealSense.height
+                self.detectInfo.distance   = detectRealSense.distance
+                self.detectInfo.area       = detectRealSense.area
+                #print(self.detectInfo.distance)
+                self.detectInfo.displayBrief()
+                """
                 else:
                     resultW = 0.0
                     resultH = 0.0
@@ -103,7 +104,7 @@ class VexLogic:
                         self.detectInfo.displayBrief()
                     else:
                         logging.info("---IGNORING--- W:%4.1f, H:%4.1f, D:%4.1f", resultW, resultH, resultD)
-     
+                    """
         #self.detectInfo.displayBrief()
         
         
