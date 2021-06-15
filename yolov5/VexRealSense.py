@@ -253,7 +253,7 @@ class VexRealSense:
                    
                             
                     # Print time (inference + NMS)
-                    #print(f'{s}Done. ({t2 - t1:.3f}s)')
+                    logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
 
                     # Stream results
@@ -261,10 +261,10 @@ class VexRealSense:
                         cv2.imshow(str("hehe"), im0)
                         cv2.waitKey(1)  # 1 millisecond
 
-                    print(idArr)
+                    #print(idArr)
                     #print(centerArr)
                     #print(depthArr)
-                    print('\n')
+                    #print('\n')
                     
             """
             "TBD"
