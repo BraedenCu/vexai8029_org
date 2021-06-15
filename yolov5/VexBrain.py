@@ -536,8 +536,10 @@ class VexBrain:
         self.mpt.map.posRecord.rot             = 0.6  # TBD - Finish
         for cnt in range(0, numBoxes):
             self.mpt.map.fifoObjBoxes[cnt].mIsActive = True
-            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfo.left)
-            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfo.top)
+            #centerLr = self.left + (self.right - self.left)/2
+            #centerTb = self.top + (self.bottom - self.top)/2
+            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfo.left + (self.detectInfo.right - self.detectInfo.left)/2)
+            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfo.top + (self.detectInfo.bottom - self.detectInfo.top)/2)
             self.mpt.map.fifoObjBoxes[cnt].width     = int(self.detectInfo.width)
             self.mpt.map.fifoObjBoxes[cnt].height    = int(self.detectInfo.height)
             self.mpt.map.fifoObjBoxes[cnt].classId   = ClassIdType.RED    # TBD
