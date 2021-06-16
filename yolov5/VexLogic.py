@@ -116,7 +116,7 @@ class VexLogic:
     def setNoTargets(self):
         "Indicate there were no detects/targets in latest scan."
         if self.numTargets != 0:
-            #logging.info("Setting numTargets to 0")
+            logging.info("Setting numTargets to 0")
             self.numTargets = 0
 
     def threadEntry(self):
@@ -145,6 +145,7 @@ class VexLogic:
         with self.lock:
             if self.numTargets == 0 or self.detectInfo == None:
                 #print("brain has no targets")
+                logging.info("brain has no targets")
                 self.brain.setNoTargets()
             else:
                 #self.detectInfo.display()
