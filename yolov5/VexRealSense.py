@@ -82,7 +82,7 @@ class VexRealSense:
             parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
             opt = parser.parse_args()
             
-            source, weights, view_img, imgsz = '0', 'runs/train/finpp/weights/last.pt', 0, 640
+            source, weights, view_img, imgsz = '0', 'runs/train/finpp/weights/last.pt', 1, 640
             source, weights, view_img, save_txt, imgsz = '0', weights, view_img, False, 640
             save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
             #maximum number of detections per image = 1000
@@ -154,8 +154,6 @@ class VexRealSense:
                 centerArr = []
                 depthArr = []
                 
-                numDetections = 0
-                numTargets = 0
                 
                 logging.info("iterating over predictions")
                 # detections per image
@@ -173,6 +171,9 @@ class VexRealSense:
                     #imc = im0.copy() if opt.save_crop else im0  # for opt.save_crop
                     imc = im0
                     
+                    numDetections = 0
+                    numTargets = 0
+                
                     #if something is detected run the following    
                     if len(det):
                         # Rescale boxes from img_size to im0 size
@@ -203,9 +204,6 @@ class VexRealSense:
                             
                             # Add bbox to image
                             if view_img or True: 
-                                
-                                #add to count
-                                numTargets += 1
                                 
                                 # Splitting xyxy* (measurement)
                                 xmin = int(xyxy[0])
@@ -240,6 +238,9 @@ class VexRealSense:
                                 if c == 0:
                                     #only pursue if confidence is greater than 60%
                                     if conf > 0.7:
+                                        #add to count
+                                        numTargets += 1
+                                        
                                         #add detections to detect realsense class
                                         #class id, confidence
                                         detectRs = DetectRealSense.DetectRealSense(c, conf)
@@ -247,9 +248,9 @@ class VexRealSense:
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
                                         self.vexLogic.addDetectRealSense(detectRs) 
                             
-            
-                                #label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
-                                #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
+                                if view_img == True:
+                                    label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
+                                    plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                                 
                             i-=1 #decrement
                         
@@ -260,8 +261,10 @@ class VexRealSense:
                         #    if depthArr[o] <= closest:
                         #        closestIndex = o
                         #        closest = depthArr[o]
+                        
+                    if numTargets == 0:
+                        self.vexLogic.setNoTargets()
                    
-                            
                     # Print time (inference + NMS)
                     logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
