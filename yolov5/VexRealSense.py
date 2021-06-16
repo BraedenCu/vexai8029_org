@@ -149,13 +149,17 @@ class VexRealSense:
                 if classify:
                     pred = apply_classifier(pred, modelc, img, im0s)
 
-                # Process detections
-                idArr = []
-                centerArr = []
-                depthArr = []
-                
-                
-                logging.info("iterating over predictions")
+                # arrays for storage
+                #idArr = []
+                #centerArr = []
+                #depthArr = []
+                ballDetections = []
+                goals = []
+                ballsNotInGoals = []
+                goalsToDescore = []
+            
+                #process detections
+                #logging.info("iterating over predictions")
                 # detections per image
                 for i, det in enumerate(pred):  
                     if webcam:  # batch_size >= 1
@@ -200,7 +204,7 @@ class VexRealSense:
                             numDetections+=1
                             
                             #add id of detected object to array
-                            idArr.append(detectionIDsNumpy[i])
+                            #idArr.append(detectionIDsNumpy[i])
                             
                             # Add bbox to image
                             if view_img or True: 
@@ -226,16 +230,16 @@ class VexRealSense:
                                 #depth in meters to center point
                                 depthMeters = dataset.getdepth(xc, yc) # Calculate depth
                                 depth = depthMeters*1000 #convert to milimeters
-                                depthArr.append(depth) #for debugging
+                                #depthArr.append(depth) #for debugging
                                 
                                 #append to array containing centers of all detected balls
-                                centerArr.append([xc, yc]) # for debugging
+                                #centerArr.append([xc, yc]) # for debugging
                                 
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
         
                                 #process detection if the class is 0 (meaning red ball), 1 = blue ball, 2 = green top
-                                if c == 0:
+                                if c == 0 or c==1:
                                     #only pursue if confidence is greater than 60%
                                     if conf > 0.7:
                                         #add to count
@@ -246,7 +250,7 @@ class VexRealSense:
                                         detectRs = DetectRealSense.DetectRealSense(c, conf)
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        self.vexLogic.addDetectRealSense(detectRs) 
+                                        ballDetections.append(detectRs)
                                 
                                 #process detection if class if 2 (green top)
                                 if c == 2:
@@ -257,25 +261,74 @@ class VexRealSense:
                                         detectRs = DetectRealSense.DetectRealSense(c, conf)
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        self.vexLogic.addDetectRealSense(detectRs)  
+                                        goals.append(detectRs)
                             
+                                
                                 if view_img == True:
                                     label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
                                     plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                                 
                             i-=1 #decrement
-                        
-                        #determine which ball is the closest
-                        #closest = depthArr[0]    
-                        #closestIndex = 0
-                        #for o in range(1, len(depthArr)-1):
-                        #    if depthArr[o] <= closest:
-                        #        closestIndex = o
-                        #        closest = depthArr[o]
-                        
+                    
+                    
                     if numTargets == 0:
                         self.vexLogic.setNoTargets()
-                   
+                        
+                    else:
+
+                        #determine closest ball not in a goal
+                        closestBall = None
+                        
+                        #iterate over all goals
+                        for d in goals:
+                            redBalls = 0
+                            blueBalls = 0
+                            gx = int(d.left + (d.right - d.left)/2)
+                            gy = int(d.top + (d.bottom - d.top)/2)
+                            gh, gw = d.height, d.width
+                            for bd in ballDetections:
+                                bx = int(bd.left + (bd.right - bd.left)/2)
+                                by = int(bd.top + (bd.bottom - bd.top)/2)
+                                if bx > gx - 0.5*gw and bx < gx + 0.5*gw:
+                                    logging.info("ball in goal")
+                                    #ball in goal
+                                    #TBD : 
+                                    #add check for height also being within constraints
+                                    
+                                    #determine ownership of goal by adding to total balls in goal
+                                    if bd.classId == 0:
+                                        redBalls+=1
+                                    elif bd.classId == 1:
+                                        blueBalls+=1 
+                                else:
+                                    #assuming we are on red, append red ball. Dont append blue balls because we ignore those when finding a target
+                                    if bd.classId == 0:
+                                        ballsNotInGoals.append(bd)
+                                        #also check if the ball is the closest ball, if so make it the closest ball
+                                        if closestBall == None:
+                                            closestBall = bd
+                                        elif closestBall.distance > bd.distance:
+                                            closestBall = bd
+                            
+                            #assuming we are on red team
+                            #determine ownership
+                            if blueBalls > redBalls:
+                                #more blue balls than red balls, we should descore it!
+                                #append other team goal to goals to descore array
+                                goalsToDescore.append(d)
+                        
+                        if closestBall != None:
+                            #send closest ball to brain
+                            closestBall.display()
+                            self.vexLogic.addDetectRealSense(closestBall) 
+                        
+                        #send goal to descore to the brain (just a random one, not the closest)
+                        #TBD: send the closest goal
+                        if goalsToDescore:
+                            logging.info("DESCORE ME RIGHT NOW")
+                            goalsToDescore[0].display()
+                            self.vexLogic.addDetectRealSense(goalsToDescore[0])
+                    
                     # Print time (inference + NMS)
                     logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
@@ -291,6 +344,13 @@ class VexRealSense:
                     #print('\n')
                     
             """
+            #determine which ball is the closest
+                        #closest = depthArr[0]    
+                        #closestIndex = 0
+                        #for o in range(1, len(depthArr)-1):
+                        #    if depthArr[o] <= closest:
+                        #        closestIndex = o
+                        #        closest = depthArr[o]
             "TBD"
             logging.info("startDetecting")
             #MODEL_STR = "ssd-mobilenet-v1"
