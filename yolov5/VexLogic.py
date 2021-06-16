@@ -52,20 +52,19 @@ class VexLogic:
             self.detectInfo = DetectInfo.DetectInfo(detectRealSense.classId, detectRealSense.confidence)
         else:
             #prevents error that occours when bugged balls are detected with depth 0
-            #print("runningthis")
             if detectRealSense.distance != 0:
                 #if self.detectInfo.width == 0:
                 #if detectRealSense.width != 0:
-                #print("ran this")
-                self.detectInfo.confidence = detectRealSense.confidence
-                self.detectInfo.left       = detectRealSense.left
-                self.detectInfo.top        = detectRealSense.top
-                self.detectInfo.right      = detectRealSense.right
-                self.detectInfo.bottom     = detectRealSense.bottom
-                self.detectInfo.width      = detectRealSense.width
-                self.detectInfo.height     = detectRealSense.height
-                self.detectInfo.distance   = detectRealSense.distance
-                self.detectInfo.area       = detectRealSense.area
+                if detectRealSense.distance > self.detectInfo.distance and self.detectInfo.distance != 0:
+                    self.detectInfo.confidence = detectRealSense.confidence
+                    self.detectInfo.left       = detectRealSense.left
+                    self.detectInfo.top        = detectRealSense.top
+                    self.detectInfo.right      = detectRealSense.right
+                    self.detectInfo.bottom     = detectRealSense.bottom
+                    self.detectInfo.width      = detectRealSense.width
+                    self.detectInfo.height     = detectRealSense.height
+                    self.detectInfo.distance   = detectRealSense.distance
+                    self.detectInfo.area       = detectRealSense.area
                 #print(self.detectInfo.distance)
                 self.detectInfo.displayBrief()
                 """
@@ -145,7 +144,7 @@ class VexLogic:
         with self.lock:
             if self.numTargets == 0 or self.detectInfo == None:
                 #print("brain has no targets")
-                logging.info("brain has no targets")
+                #logging.info("brain has no targets")
                 self.brain.setNoTargets()
             else:
                 #self.detectInfo.display()
