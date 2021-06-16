@@ -82,7 +82,7 @@ class VexRealSense:
             parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
             opt = parser.parse_args()
             
-            source, weights, view_img, imgsz = '0', 'runs/train/finpp/weights/last.pt', 0, 640
+            source, weights, view_img, imgsz = '0', 'runs/train/pp4/weights/last.pt', 1, 640
             source, weights, view_img, save_txt, imgsz = '0', weights, view_img, False, 640
             save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
             #maximum number of detections per image = 1000
@@ -233,8 +233,8 @@ class VexRealSense:
                                 
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
-
-                                #only process detection if the class is 0 (meaning red ball), 1 = blue ball
+        
+                                #process detection if the class is 0 (meaning red ball), 1 = blue ball, 2 = green top
                                 if c == 0:
                                     #only pursue if confidence is greater than 60%
                                     if conf > 0.7:
@@ -247,6 +247,17 @@ class VexRealSense:
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
                                         self.vexLogic.addDetectRealSense(detectRs) 
+                                
+                                #process detection if class if 2 (green top)
+                                if c == 2:
+                                    if conf > 0.7:
+                                        numTargets += 1
+                                        #add detections to detect realsense class
+                                        #class id, confidence
+                                        detectRs = DetectRealSense.DetectRealSense(c, conf)
+                                        #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
+                                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
+                                        self.vexLogic.addDetectRealSense(detectRs)  
                             
                                 if view_img == True:
                                     label = None if opt.hide_labels else (names[c] if opt.hide_conf else f'{names[c]} {conf:.2f}')
