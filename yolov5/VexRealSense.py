@@ -50,7 +50,7 @@ class VexRealSense:
     def startDetecting(self):
         
         while (True):
-            logging.info("start detect loop")
+            #logging.info("start detect loop")
             
             #detectRs = DetectRealSense.DetectRealSense(0, 99)
             #detectRs.setBox(1, 1, 1, 1, 1, 1, 1, 1)
@@ -128,7 +128,7 @@ class VexRealSense:
                 model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
             t0 = time.time()
             
-            logging.info("before dataset loop")
+            #logging.info("before dataset loop")
             for path, img, im0s in dataset:
                 img = torch.from_numpy(img).to(device)
                 img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -153,11 +153,13 @@ class VexRealSense:
                 #idArr = []
                 #centerArr = []
                 #depthArr = []
-                ballDetections = []
-                goals = []
-                ballsNotInGoals = []
-                goalsToDescore = []
+                #balls = []
+                #goals = []
+                detections = []
             
+                #initiate detect realsense object
+                realsenseObj = DetectRealSense.DetectRealSense()
+                
                 #process detections
                 #logging.info("iterating over predictions")
                 # detections per image
@@ -197,9 +199,9 @@ class VexRealSense:
                         
                         # Write results
                         #conf = confidence (0 - 1), cls = class id, xyxy = bounding box coordinates
-                        logging.info("iterating over each detection")
+                        #logging.info("iterating over each detection")
                         for *xyxy, conf, cls in reversed(det):
-                            logging.info("iterated over detection")
+                        #    logging.info("iterated over detection")
                             
                             numDetections+=1
                             
@@ -237,31 +239,35 @@ class VexRealSense:
                                 
                                 # integer class (label either 0 or 1)
                                 c = int(cls) 
-        
+                                conf = float(conf)
+                                
                                 #process detection if the class is 0 (meaning red ball), 1 = blue ball, 2 = green top
                                 if c == 0 or c==1:
                                     #only pursue if confidence is greater than 60%
                                     if conf > 0.7:
                                         #add to count
                                         numTargets += 1
-                                        
                                         #add detections to detect realsense class
                                         #class id, confidence
-                                        detectRs = DetectRealSense.DetectRealSense(c, conf)
+                                        detectRs = DetectRealSense.DetectionRealsense(c, conf)
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        ballDetections.append(detectRs)
-                                
+                                        detections.append(detectRs)
+                                        #realsenseObj.addBall(detectRs)
+                                        #detectRs.display()
+                                        
+                                        
                                 #process detection if class if 2 (green top)
                                 if c == 2:
                                     if conf > 0.7:
                                         numTargets += 1
                                         #add detections to detect realsense class
                                         #class id, confidence
-                                        detectRs = DetectRealSense.DetectRealSense(c, conf)
+                                        detectRs = DetectRealSense.DetectionRealsense(c, conf)
                                         #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
                                         detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        goals.append(detectRs)
+                                        detections.append(detectRs)
+                                        #realsenseObj.addGoal(detectRs)
                             
                                 
                                 if view_img == True:
@@ -269,66 +275,15 @@ class VexRealSense:
                                     plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                                 
                             i-=1 #decrement
-                    
-                    
+
+
                     if numTargets == 0:
                         self.vexLogic.setNoTargets()
-                        
-                    else:
-
-                        #determine closest ball not in a goal
-                        closestBall = None
-                        
-                        #iterate over all goals
-                        for d in goals:
-                            redBalls = 0
-                            blueBalls = 0
-                            gx = int(d.left + (d.right - d.left)/2)
-                            gy = int(d.top + (d.bottom - d.top)/2)
-                            gh, gw = d.height, d.width
-                            for bd in ballDetections:
-                                bx = int(bd.left + (bd.right - bd.left)/2)
-                                by = int(bd.top + (bd.bottom - bd.top)/2)
-                                if bx > gx - 0.5*gw and bx < gx + 0.5*gw:
-                                    logging.info("ball in goal")
-                                    #ball in goal
-                                    #TBD : 
-                                    #add check for height also being within constraints
-                                    
-                                    #determine ownership of goal by adding to total balls in goal
-                                    if bd.classId == 0:
-                                        redBalls+=1
-                                    elif bd.classId == 1:
-                                        blueBalls+=1 
-                                else:
-                                    #assuming we are on red, append red ball. Dont append blue balls because we ignore those when finding a target
-                                    if bd.classId == 0:
-                                        ballsNotInGoals.append(bd)
-                                        #also check if the ball is the closest ball, if so make it the closest ball
-                                        if closestBall == None:
-                                            closestBall = bd
-                                        elif closestBall.distance > bd.distance:
-                                            closestBall = bd
-                            
-                            #assuming we are on red team
-                            #determine ownership
-                            if blueBalls > redBalls:
-                                #more blue balls than red balls, we should descore it!
-                                #append other team goal to goals to descore array
-                                goalsToDescore.append(d)
-                        
-                        if closestBall != None:
-                            #send closest ball to brain
-                            closestBall.display()
-                            self.vexLogic.addDetectRealSense(closestBall) 
-                        
-                        #send goal to descore to the brain (just a random one, not the closest)
-                        #TBD: send the closest goal
-                        if goalsToDescore:
-                            logging.info("DESCORE ME RIGHT NOW")
-                            goalsToDescore[0].display()
-                            self.vexLogic.addDetectRealSense(goalsToDescore[0])
                     
+                    else: 
+                        #send detections to vexlogic
+                        self.vexLogic.setDetectInfoArray(detections)
+                
                     # Print time (inference + NMS)
                     logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
