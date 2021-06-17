@@ -74,20 +74,25 @@ class VexLogic:
                 elif det.classId == 2:
                     goalsArr.append(det)
             
-            #iterate over goals to determine balls in goal and add those balls to goal datastructure       
+            #iterate over goals to determine balls in goal and add those balls to goal datastructure   
+            #logging.info(goalsArr)    
             if goalsArr:
-                for d in range(0, len(goalsArr)-1):
+                #logging.info("got here")
+                for d in range(0, len(goalsArr)):
+                    #logging.info("iterating over goals")
                     redBalls = 0
                     blueBalls = 0
                     ballsInGoal = []
                     ownership = None
-                    gx = int(goalsArr[d].left + (goalsArr[d].right - goalsArr[d].left)/2)
-                    gy = int(goalsArr[d].top + (goalsArr[d].bottom - goalsArr[d].top)/2)
-                    gh, gw = goalsArr[d].height, goalsArr[d].width
+                    #logging.info(d)
+                    goal = goalsArr[d]
+                    gx = int(goal.left + (goal.right - goal.left)/2)
+                    gy = int(goal.top + (goal.bottom - goal.top)/2)
+                    gh, gw = goal.height, goal.width
                     for b in ballsArr:
                         bx = int(b.left + (b.right - b.left)/2)
                         by = int(b.top + (b.bottom - b.top)/2)
-                        if bx > gx - 0.5*gw and bx < gx + 0.5*gw:
+                        if bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw):
                             ballsInGoal.append(b)
                             #TBD: add y calculation, here is just checks if x is within the goal range
                             if b.classId == 0:
@@ -101,14 +106,15 @@ class VexLogic:
                     
                     #if more blue than red, descore it
                     if blueBalls > redBalls:
-                        goalsToDescore.append(goalsArr[d])
+                        goalsToDescore.append(goal)
                     
                     #iterate over balls in goals
                     topBall = None
                     middleBall = None
                     bottomBall = None
+                    #logging.info(ballsInGoal)
                     for i in ballsInGoal: 
-                        if i==None or i.top > topBall.top:
+                        if topBall==None or i.top > topBall.top:
                             topBall = i
                         elif middleBall==None or i.top > middleBall.top:
                             middleBall = i
@@ -127,6 +133,7 @@ class VexLogic:
             descoring = True
             if goalsToDescore:
                 if descoring:
+                    logging.info("descoring goal found")
                     #for now just descore the first goal found that needs to be descored
                     self.detectInfo.confidence = goalsToDescore[0].confidence
                     self.detectInfo.left       = goalsToDescore[0].left
