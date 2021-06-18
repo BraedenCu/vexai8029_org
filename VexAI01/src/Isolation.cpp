@@ -89,6 +89,24 @@ namespace IsolationMode {
     setJetsonDisplay(leftRight);
   }
 
+  void findNewTarget() {
+    backUp(100) //back up 100 meters
+    findTarget() //spin until target is found
+  }
+
+  void targetGoal(goalData) {
+    setWheelSpeeds()
+    if targetIsLost or distance > 50 {
+      while(bumper is not pressed) {
+        moveforward()
+      }
+    }
+    while(limit switch is not pressed) {
+      intakeBalls()
+    }
+    findNewTarget()
+  }
+
   //-----------------------
   // Isolation mode event loop
   //-----------------------
