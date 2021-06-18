@@ -1,9 +1,18 @@
 #include "vex.h"
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// BumperC              bumper        C               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 #include "MysteryGang/AutonMode.h"
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/CurConfig.h"
-#include "MysteryGang/ManualMode.h"
+#include "MysteryGang/ManualMode.h" 
 #include "MysteryGang/RobotConfig.h"
+#include "Isolation.h"
+
+extern void driveForward();
 
 // create instance of jetson class to receive location and other
 // data from the Jetson nano
@@ -111,7 +120,7 @@ void enterAutonomous(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-void enterUsercontrol(void) {
+void enterUserControl(void) {
   ManualMode::enterManualControl();
 }
 
@@ -135,8 +144,11 @@ int main() {
   // start the status update display
   thread t1(dashboardTask);
 
+  thread t2(IsolationMode::isolationModeTask);
   // Set up callbacks for autonomous and driver control periods.
-  hwCompetition.autonomous(autonomousMain);
+  //hwCompetition.autonomous(autonomousMain);
+  //enterUserControl();
+  //driveForward();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

@@ -26,7 +26,7 @@ namespace Cpm {
 
   // Move the robot forwards for the specified motor rotations
   // Rotations in degrees must be positive
-  void moveRobotForwardEncoders(int rotationsInDegrees);
+  void moveRobotForwardEncoders(int ForwardTime);
 
   // Move the robot forwards for the specified amount of time
   void moveRobotForwardTime(unsigned int numMillisecs);

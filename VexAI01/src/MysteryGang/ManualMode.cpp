@@ -54,16 +54,20 @@ namespace ManualMode {
       // Move cube pull in treads based on buttonL1
       hwMotorIntakeLeft.spin(vex::directionType::fwd, sIntakeLeftMotorSpeed, vex::velocityUnits::pct);
       hwMotorIntakeRight.spin(vex::directionType::fwd, sIntakeRightMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeLifter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
+      hwMotorPusher.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
 
-      // Move cube push out treads based on buttonY
+      // Move cube push out treads based on buttonL2
       hwMotorIntakeLeft.spin(vex::directionType::rev, sIntakeLeftMotorSpeed, vex::velocityUnits::pct);
       hwMotorIntakeRight.spin(vex::directionType::rev, sIntakeRightMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeLifter.spin(vex::directionType::rev, sLifterMotorSpeed, vex::velocityUnits::pct);
+      hwMotorPusher.spin(vex::directionType::rev, sPusherMotorSpeed, vex::velocityUnits::pct);
 
       // Move cube pull in lifter based on buttonA/B
-      hwMotorIntakeLifter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeLifter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
 
       // Move pusher based on buttonR1/R2
-      hwMotorPusher.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorPusher.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
 
       // Short delay just in case we want to display something on the controller
       vex::task::sleep(1);
@@ -88,64 +92,64 @@ namespace ManualMode {
   void buttonL1Pressed() {
     sIntakeRightMotorSpeed = -150;
     sIntakeLeftMotorSpeed = -150;
+    sLifterMotorSpeed = 150;
+    sPusherMotorSpeed = 150;
   }
 
   // Stop cube pull in
   void buttonL1Released() {
     sIntakeRightMotorSpeed = 0;
     sIntakeLeftMotorSpeed = 0;
+    sLifterMotorSpeed = 0;
+    sPusherMotorSpeed = 0;
   }
 
   // Activate cube push out
   void buttonL2Pressed() {
     sIntakeRightMotorSpeed = 150;
     sIntakeLeftMotorSpeed = 150;
+    sLifterMotorSpeed = -150;
+    sPusherMotorSpeed = -150;
   }
 
   // Stop cube push out
   void buttonL2Released() {
     sIntakeRightMotorSpeed = 0;
     sIntakeLeftMotorSpeed = 0;
+    sLifterMotorSpeed = 0;
+    sPusherMotorSpeed = 0;
   }
 
   // Activate pusher forwards
   void buttonR1Pressed() {
-    sPusherMotorSpeed = 150;
   }
 
   // Stop pusher forwards
   void buttonR1Released() {
-    sPusherMotorSpeed = 0;
   }
 
   // Activate pusher back
   void buttonR2Pressed() {
-    sPusherMotorSpeed = -150;
   }
 
   // Stop pusher back
   void buttonR2Released() {
-    sPusherMotorSpeed = 0;
   }
 
   // Pull lifter up
   void buttonAPressed() {
-    sLifterMotorSpeed = 150;
   }
 
   // Stop lifter
   void buttonAReleased() {
-    sLifterMotorSpeed = 0;
   }
 
   // Push lifter down
   void buttonBPressed() {
-    sLifterMotorSpeed = -150;
   }
 
   // Stop lifter
   void buttonBReleased() {
-    sLifterMotorSpeed = 0;
   }
 
   const char* getBuildDate() {

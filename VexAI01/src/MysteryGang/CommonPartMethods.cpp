@@ -104,8 +104,8 @@ namespace Cpm {
     leftMotorSpeed = 150;
     rightMotorSpeed = 150;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
     
@@ -173,13 +173,20 @@ namespace Cpm {
 
   void turnRobotLeft(int rotationsInDegrees) {
     // Turn left
-    hwEncoderWheels.setPosition(0, degrees);
-    hwMotorWheelBackLeft.spin(reverse);
-    hwMotorWheelBackRight.spin(forward);
-    hwMotorWheelFrontLeft.spin(reverse);
-    hwMotorWheelFrontRight.spin(forward);
-    while (hwEncoderWheels.position(degrees) > rotationsInDegrees) {
-    }
+    //hwMotorWheelFrontLeft.resetPosition();
+    //hwMotorWheelBackLeft.resetPosition();
+
+    int numMillisecs = 2000;
+    int leftMotorSpeed = 10;
+    int rightMotorSpeed = 10;
+    hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    vex::task::sleep(numMillisecs);
+
+    //while ((hwMotorWheelFrontLeft.position(degrees) < rotationsInDegrees) || (hwMotorWheelBackLeft.position(degrees) < rotationsInDegrees)) {
+    //}
     stopWheels();
   }
 
