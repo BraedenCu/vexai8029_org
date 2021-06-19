@@ -6,6 +6,7 @@ import VexBrain
 import DetectInfo
 import DetectRealSense
 import FlirPosInfo
+import copy
 
 format = VexConfig.getLoggingFormat()
 logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
@@ -65,6 +66,7 @@ class VexLogic:
             goalContentsArr = [] #2d array containing the ball contents of the goal arrays (indexed in the same way as goals arr)
             goalsToDescore = []
             goalsToScore = []
+            detectInfoList = []
             
             #populate arrays
             for det in detections:
@@ -135,10 +137,10 @@ class VexLogic:
                     #        goalsToDescore
             
             #if we are descoring, send the goal detection to the brain (there also must be a goal to descore in view)
-            descoring = False
+            descoring = True
             if goalsToDescore:
                 if descoring:
-                    logging.info("descoring goal found")
+                    #logging.info("descoring goal found")
                     #for now just descore the first goal found that needs to be descored
                     self.detectInfo.confidence = goalsToDescore[0].confidence
                     self.detectInfo.left       = goalsToDescore[0].left
@@ -149,6 +151,9 @@ class VexLogic:
                     self.detectInfo.height     = goalsToDescore[0].height
                     self.detectInfo.distance   = goalsToDescore[0].distance
                     self.detectInfo.area       = goalsToDescore[0].area
+                    #logging.info("added0")
+                    detectInfoList.append(copy.copy(self.detectInfo))
+        
             
             #if we are collecting balls
             collectBall = True
@@ -180,13 +185,17 @@ class VexLogic:
                 self.detectInfo.height     = closestBall.height
                 self.detectInfo.distance   = closestBall.distance
                 self.detectInfo.area       = closestBall.area
+                #logging.info("added")
+                detectInfoList.append(copy.copy(self.detectInfo))
                 
             #if we have a ball in our robot and need to score
-            scoringBall = False
+            scoringBall = True
             closestGoal = None
             
             if scoringBall == True and goalsArr!=None: #goals need to be detected to score
                 #find closest goal, and go towards it 
+                #logging.info("running")
+                #logging.info(len(goalsToScore))
                 for goal in goalsToScore:
                     if closestGoal == None:
                         closestGoal = goal
@@ -205,11 +214,17 @@ class VexLogic:
                     self.detectInfo.height     = closestGoal.height
                     self.detectInfo.distance   = closestGoal.distance
                     self.detectInfo.area       = closestGoal.area
-                
+                    #logging.info("added2")
+                    detectInfoList.append(copy.copy(self.detectInfo))
                 
             #display detectinfo
-            if self.detectInfo:
-                self.detectInfo.display()
+            #if self.detectInfo:
+            #    self.detectInfo.display()
+            
+            #display elements of detect info list
+            #logging.info(len(detectInfoList))
+            for detect in detectInfoList:
+                detect.display()
             
     def setDetectInfo(self, detectRealSense):
         "Set up the DetectInfo based on RealSense info."
