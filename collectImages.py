@@ -61,9 +61,9 @@ def spliceIntoFrames(parentPath, inputVideoPath, outputPath):
     cap = cv2.VideoCapture(inputVideoPath)
     #save one image every 1000 frames
 
-    frameIndexes = 20
+    frameIndexes = 10
     iteration = 1
-    name = 113
+    name = 201
     while(cap.isOpened()):
         #ret is a bool that returns true if a frame is found
         #frame returns the frame
@@ -77,14 +77,15 @@ def spliceIntoFrames(parentPath, inputVideoPath, outputPath):
             print("writing")
             #proper naming convention
             name+=1
-            iteration+=1
+        iteration+=1
 
-if __name__ == "__main__":
-    parentPath = '/home/dev/dev/robotics/vexai8029/'
-    recordVideo(parentPath, parentPath)
+if __name__ == "__main__": 
+    print("running")
+    parentPath = '/home/dev/dev/robotics/vexai8029_org/'
+    #recordVideo(parentPath, parentPath)
     #setupOutputDirectories(parentPath)
     #copyFile('output.avi', 'outputCopy.avi')
     inputVideoPath = parentPath + 'output.avi'
-    #outputPath = parentPath + 'testImages/'
-    #spliceIntoFrames(parentPath, inputVideoPath, outputPath)
+    outputPath = parentPath + 'testImages'
+    spliceIntoFrames(parentPath, inputVideoPath, outputPath)
     print("Task completed")
