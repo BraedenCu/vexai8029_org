@@ -137,7 +137,7 @@ class VexLogic:
                     #        goalsToDescore
             
             #if we are descoring, send the goal detection to the brain (there also must be a goal to descore in view)
-            descoring = True
+            descoring = False
             if goalsToDescore:
                 if descoring:
                     #logging.info("descoring goal found")
@@ -189,7 +189,7 @@ class VexLogic:
                 detectInfoList.append(copy.copy(self.detectInfo))
                 
             #if we have a ball in our robot and need to score
-            scoringBall = True
+            scoringBall = False
             closestGoal = None
             
             if scoringBall == True and goalsArr!=None: #goals need to be detected to score
