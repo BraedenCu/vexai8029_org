@@ -151,7 +151,7 @@ class VexLogic:
                     self.detectInfo.height     = goalsToDescore[0].height
                     self.detectInfo.distance   = goalsToDescore[0].distance
                     self.detectInfo.area       = goalsToDescore[0].area
-                    #logging.info("added0")
+                    logging.info("addedGoalToDescore")
                     detectInfoList.append(copy.copy(self.detectInfo))
         
             
@@ -218,8 +218,8 @@ class VexLogic:
                     detectInfoList.append(copy.copy(self.detectInfo))
                 
             #display detectinfo
-            if self.detectInfo:
-                self.detectInfo.display()
+            #if self.detectInfo:
+            #    self.detectInfo.display()
             
             #display elements of detect info list
             #logging.info(len(detectInfoList))
