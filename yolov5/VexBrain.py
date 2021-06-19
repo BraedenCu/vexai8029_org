@@ -498,6 +498,19 @@ class VexBrain:
             except:
                 logging.info("***ERROR***; Couldn't open /dev/ttyACM1")
 
+    def addDetectArray(self, detectInfoArray):
+        "TOOO DOOOO TOOO DOOO TOO DOO"
+        #TBD
+        #TBD
+        #TBD
+        #TBD
+        #TBD
+        #TBD
+        #TBD
+        #TBD
+        pass
+    
+    
     def addDetect(self, detectInfo):
         "Add detection info of an object from VexLogic."
         if self.numTargets == 0:
