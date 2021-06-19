@@ -1,6 +1,6 @@
 # THE PROCESS
 ssh nano@192.168.86.32  
-cd Development/vexai8029_org   # this directory is used as a docker volume when the docker container is run 
+cd Development/vexai8029_org/vexai8029_org   # this directory is used as a docker volume when the docker container is run 
 git pull origin main  # get the most recent updates from this repo  
 sudo docker run --gpus all -it --privileged -v /dev:/dev -v /home/nano/Development/vexai8029_org:/usr/shared-dev yolov5:rs  
 # now you are in the docker container, run the following commands:  
