@@ -218,13 +218,13 @@ class VexLogic:
                     detectInfoList.append(copy.copy(self.detectInfo))
                 
             #display detectinfo
-            #if self.detectInfo:
-            #    self.detectInfo.display()
+            if self.detectInfo:
+                self.detectInfo.display()
             
             #display elements of detect info list
             #logging.info(len(detectInfoList))
-            for detect in detectInfoList:
-                detect.display()
+            #for detect in detectInfoList:
+                #detect.display()
             
     def setDetectInfo(self, detectRealSense):
         "Set up the DetectInfo based on RealSense info."
