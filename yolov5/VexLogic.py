@@ -137,7 +137,7 @@ class VexLogic:
                     #        goalsToDescore
             
             #if we are descoring, send the goal detection to the brain (there also must be a goal to descore in view)
-            descoring = False
+            descoring = True
             if goalsToDescore:
                 if descoring:
                     #logging.info("descoring goal found")
@@ -156,7 +156,7 @@ class VexLogic:
         
             
             #if we are collecting balls
-            collectBall = True
+            collectBall = False
             closestBall = None
             
             #balls not in goals will only be populated if goals exist, otherwise just use balls
