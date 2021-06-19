@@ -64,6 +64,7 @@ class VexLogic:
             ballsNotInGoals = [] #balls not in goals
             goalContentsArr = [] #2d array containing the ball contents of the goal arrays (indexed in the same way as goals arr)
             goalsToDescore = []
+            goalsToScore = []
             
             #populate arrays
             for det in detections:
@@ -107,6 +108,10 @@ class VexLogic:
                     #if more blue than red, descore it
                     if blueBalls > redBalls:
                         goalsToDescore.append(goal)
+                    
+                    #if total number of balls in goal is < 3, add it to goals to score array
+                    if blueBalls + redBalls < 3:
+                        goalsToScore.append(goal)
                     
                     #iterate over balls in goals
                     topBall = None
@@ -176,7 +181,32 @@ class VexLogic:
                 self.detectInfo.distance   = closestBall.distance
                 self.detectInfo.area       = closestBall.area
                 
+            #if we have a ball in our robot and need to score
+            scoringBall = False
+            closestGoal = None
             
+            if scoringBall == True and goalsArr!=None: #goals need to be detected to score
+                #find closest goal, and go towards it 
+                for goal in goalsToScore:
+                    if closestGoal == None:
+                        closestGoal = goal
+                    else:
+                        if closestGoal.distance > goal.distance:
+                            closestGoal = goal
+                    
+                #set detectInfo detection to closest goal to send to cortex
+                if closestGoal!=None:
+                    self.detectInfo.confidence = closestGoal.confidence
+                    self.detectInfo.left       = closestGoal.left
+                    self.detectInfo.top        = closestGoal.top
+                    self.detectInfo.right      = closestGoal.right
+                    self.detectInfo.bottom     = closestGoal.bottom
+                    self.detectInfo.width      = closestGoal.width
+                    self.detectInfo.height     = closestGoal.height
+                    self.detectInfo.distance   = closestGoal.distance
+                    self.detectInfo.area       = closestGoal.area
+                
+                
             #display detectinfo
             if self.detectInfo:
                 self.detectInfo.display()
