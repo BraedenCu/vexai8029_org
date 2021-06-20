@@ -24,6 +24,7 @@ class VexLogic:
             VexLogic.__instance = self
             self.brain = None
             self.detectInfo = None
+            self.detectInfoList = None
             self.ballArr = None
             self.goalArr = None
             self.numTargets = 0
@@ -232,7 +233,7 @@ class VexLogic:
                 
             #if detectInfo is not empty, add it to vexBrain object
             if self.detectInfo:
-                self.addDetectList(detectInfoList)
+                self.detectInfoList = detectInfoList
             
             #display elements of detect info list
             #logging.info(len(detectInfoList))
@@ -349,5 +350,5 @@ class VexLogic:
             else:
                 #self.detectInfo.display()
                 #self.detectInfo.displayBrief()
-                self.brain.addDetect(self.detectInfo)
+                self.brain.addDetectList(self.detectInfo)
 
