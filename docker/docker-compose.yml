@@ -1,0 +1,11 @@
+version: '1'
+services:
+    rs:
+        build:
+            context: .
+            dockerfile: dockerfile
+        image: yolov5:0.1
+        command: sudo docker run --gpus all -it --privileged -v /dev:/dev -v /home/nano/Development/vexai8029_org:/usr/shared-dev yolov5:rs
+        command: cd /usr/shared-dev/yolov5
+        command: python3 VexAiJetson.py
+                
