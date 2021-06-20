@@ -79,7 +79,7 @@ RUN python3.8 -m pip install serial
 
 RUN python3.8 -m pip install pyserial
 
-#CMD ["/bin/bash", "/usr/shared-dev/yolov5/startup.sh"]
+CMD ["/bin/bash", "/usr/shared-dev/yolov5/startup.sh"]
 
 
 #VOLUME /home/nano/Development/vexai8029_org
