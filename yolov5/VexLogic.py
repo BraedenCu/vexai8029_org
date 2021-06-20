@@ -95,7 +95,9 @@ class VexLogic:
                     for b in ballsArr:
                         bx = int(b.left + (b.right - b.left)/2)
                         by = int(b.top + (b.bottom - b.top)/2)
-                        if bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw):
+                        #if (bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw)):
+                        #UNTESTED v VERSION using updated goal detection 
+                        if (bx > (goal.left) and bx < (goal.right)) and ((by > goal.bottom) and by < goal.top):
                             ballsInGoal.append(b)
                             #TBD: add y calculation, here is just checks if x is within the goal range
                             if b.classId == 0:
