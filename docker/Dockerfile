@@ -75,7 +75,7 @@ ENV PYTHONPATH=/build/wrappers/python:/usr/local/lib
 
 RUN python3.8 -m pip install serial
 
-RUN python3.8 -m pip install cupy-cuda102
+#RUN python3.8 -m pip install cupy-cuda102
 
 RUN python3.8 -m pip install pyserial
 
