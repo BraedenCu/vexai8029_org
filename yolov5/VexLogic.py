@@ -51,6 +51,7 @@ class VexLogic:
             goalsArr = [] #Goals
             ballsArr = [] #all balls
             ballsNotInGoals = [] #balls not in goals
+            ballsInGoals = []
             goalContentsArr = [] #2d array containing the ball contents of the goal arrays (indexed in the same way as goals arr)
             goalsToDescoreRed = []
             goalsToDescoreBlue = []
@@ -89,7 +90,8 @@ class VexLogic:
                         #if (bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw)):
                         #UNTESTED v VERSION using updated goal detection 
                         if (bx > (goal.left) and bx < (goal.right)) and ((by > goal.bottom) and by < goal.top):
-                            ballsInGoal.append(b)
+                            ballsInGoal.append(b) #add to local list of balls in individual goal being iterated over
+                            ballsInGoals.append(b) #add to total list of all balls in goals
                             if b.classId == 0:
                                 redBalls+=1
                             elif b.classId == 1:
@@ -113,19 +115,19 @@ class VexLogic:
                         goalsToScore.append(goal)
                     
                     #iterate over balls in goals
-                    #topBall = None
-                    #middleBall = None
-                    #bottomBall = None
+                    topBall = None
+                    middleBall = None
+                    bottomBall = None
                     #logging.info(ballsInGoal)
-                    #for i in ballsInGoal: 
-                    #    if topBall==None or i.top > topBall.top:
-                    #        topBall = i
-                    #    elif middleBall==None or i.top > middleBall.top:
-                    #        middleBall = i
-                    #    elif bottomBall==None or i.top > bottomBall.top:
-                    #        bottomBall = i
+                    for i in ballsInGoal: 
+                        if topBall==None or i.top > topBall.top:
+                            topBall = i
+                        elif middleBall==None or i.top > middleBall.top:
+                            middleBall = i
+                        elif bottomBall==None or i.top > bottomBall.top:
+                            bottomBall = i
                     
-                    #goalContentsArr.append([topBall, middleBall, bottomBall])
+                    goalContentsArr.append([topBall, middleBall, bottomBall])
                     
                     #check if we should descore this goal, and if so, append it to the to descore array in the format [0, 1, 0]
                     #1 means take ball out of goal, 0 means it is your teams color so leave it in. [-1, 0, 1] -1 means no ball is there
@@ -296,7 +298,32 @@ class VexLogic:
                     detectInfoList.append(copy.copy(self.detectInfo))
                 
                 
-
+            #find the closest ball IN a goal and add it to the detect info list
+            closestBallInGoal = None
+            if ballsInGoals:
+                for b in ballsInGoals:
+                    if closestBallInGoal==None:
+                        closestBallInGoal = b
+                    else:
+                        if closestBallInGoal.distance > b.distance:
+                            closestBallInGoal = b
+                            
+                if closestBallInGoal:
+                    #set closest ball in goal value
+                    self.detectInfo.confidence = closestBallInGoal.confidence
+                    self.detectInfo.left       = closestBallInGoal.left
+                    self.detectInfo.top        = closestBallInGoal.top
+                    self.detectInfo.right      = closestBallInGoal.right
+                    self.detectInfo.bottom     = closestBallInGoal.bottom
+                    self.detectInfo.width      = closestBallInGoal.width
+                    self.detectInfo.height     = closestBallInGoal.height
+                    self.detectInfo.distance   = closestBallInGoal.distance
+                    self.detectInfo.area       = closestBallInGoal.area
+                    self.detectInfo.classId    = 11 #score red ball / blue ball
+                    #logging.info("added2")
+                    detectInfoList.append(copy.copy(self.detectInfo))
+            
+            
             #if detectInfo is not empty, add it to vexBrain object
             if self.detectInfo:
                 self.detectInfoList = detectInfoList
