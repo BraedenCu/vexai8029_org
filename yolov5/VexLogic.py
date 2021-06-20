@@ -302,7 +302,7 @@ class VexLogic:
                 self.detectInfoList = detectInfoList
             
             #display elements of detect info list
-            #logging.info(len(detectInfoList))
+            logging.info(len(detectInfoList))
             #for detect in detectInfoList:
                 #detect.display()
         
