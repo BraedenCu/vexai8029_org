@@ -350,5 +350,5 @@ class VexLogic:
             else:
                 #self.detectInfo.display()
                 #self.detectInfo.displayBrief()
-                self.brain.addDetectList(self.detectInfo)
+                self.brain.addDetectList(self.detectinfoList)
 
