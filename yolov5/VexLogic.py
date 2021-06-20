@@ -93,6 +93,7 @@ class VexLogic:
                     gx = int(goal.left + (goal.right - goal.left)/2)
                     gy = int(goal.top + (goal.bottom - goal.top)/2)
                     gh, gw = goal.height, goal.width
+                    logging.info("addedGoalToDescore")
                     for b in ballsArr:
                         bx = int(b.left + (b.right - b.left)/2)
                         by = int(b.top + (b.bottom - b.top)/2)
@@ -163,7 +164,7 @@ class VexLogic:
         
             
             #if we are collecting balls
-            collectBall = False
+            collectBall = True
             closestBall = None
             
             #balls not in goals will only be populated if goals exist, otherwise just use balls
@@ -203,7 +204,7 @@ class VexLogic:
                 detectInfoList.append(copy.copy(self.detectInfo))
                 
             #if we have a ball in our robot and need to score
-            scoringBall = False
+            scoringBall = True
             closestGoal = None
             
             if scoringBall == True and goalsArr!=None: #goals need to be detected to score
@@ -343,12 +344,12 @@ class VexLogic:
         "Send the VEX Cortex Brain the latest object position info."
         # TBD - LockGet()
         with self.lock:
-            if self.numTargets == 0 or self.detectInfo == None:
+            if self.numTargets == 0 or self.detectInfoList == None:
                 #print("brain has no targets")
                 #logging.info("brain has no targets")
                 self.brain.setNoTargets()
             else:
                 #self.detectInfo.display()
                 #self.detectInfo.displayBrief()
-                self.brain.addDetectList(self.detectinfoList)
+                self.brain.addDetectList(self.detectInfoList)
 
