@@ -82,7 +82,7 @@ class VexRealSense:
             parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
             opt = parser.parse_args()
             
-            source, weights, view_img, imgsz = '0', 'runs/train/goals3/weights/last.pt', 1, 640
+            source, weights, view_img, imgsz = '0', 'runs/train/goals3/weights/last.pt', 0, 640
             source, weights, view_img, save_txt, imgsz = '0', weights, view_img, False, 640
             save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
             #maximum number of detections per image = 1000
