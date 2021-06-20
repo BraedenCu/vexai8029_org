@@ -79,7 +79,9 @@ RUN python3.8 -m pip install serial
 
 RUN python3.8 -m pip install pyserial
 
-WORKDIR /usr/shared-dev/yolov5
+RUN /bin/bash
+
+WORKDIR /usr/shared-dev/yolov5/
 
 RUN ls
 
