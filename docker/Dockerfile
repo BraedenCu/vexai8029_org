@@ -81,7 +81,7 @@ RUN python3.8 -m pip install pyserial
 
 VOLUME /home/nano/Development/vexai8029_org
 
-WORKDIR /home/nano/Development/vexai8029_org/yolov5
+WORKDIR /vexai8029_org/yolov5
 
 RUN pwd
 
