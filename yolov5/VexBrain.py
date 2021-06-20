@@ -486,39 +486,23 @@ class VexBrain:
             raise Exception("VexBrain - Singleton error in __init__")
         else:
             VexBrain.__instance = self
-            self.detectInfo = None
+            self.detectInfoList = []
             self.msgRxCnt = 0
             self.msgTxCnt = 0
             self.brain = None
             self.mpt = None
-            self.numTargets = 0
             try:
                 self.brain = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
                 self.mpt = MapPacketType()
             except:
                 logging.info("***ERROR***; Couldn't open /dev/ttyACM1")
 
-    def addDetectArray(self, detectInfoArray):
-        "TOOO DOOOO TOOO DOOO TOO DOO"
-        #TBD
-        #TBD
-        #TBD
-        #TBD
-        #TBD
-        #TBD
-        #TBD
-        #TBD
-        pass
-    
-    
-    def addDetect(self, detectInfo):
-        "Add detection info of an object from VexLogic."
-        if self.numTargets == 0:
-            #logging.info("Setting numTargets to 1")
-            self.numTargets = 1
-        if self.detectInfo == None:
-            self.detectInfo = detectInfo
-            #self.detectInfo.display()
+    def addDetectList(self, diList):
+        "Add detection info of objects from VexLogic."
+        self.detectInfoList.clear()
+        for detect in diList :
+            self.detectInfoList.append(detect)
+            detect.display()
 
     def addMap(self):
         "TBD"
@@ -535,36 +519,34 @@ class VexBrain:
         #self.setTestData2()
         #self.setTestData3()
         #self.setTestData4()
-        numBoxes = self.numTargets   # TBD - Use actual number
+        numBoxes = len(self.detectInfoList)
         numMaps  = 0   # TBD - Use actual number
         self.mpt.map.boxnum                    = numBoxes
         self.mpt.map.mapnum                    = numMaps
         self.mpt.map.posRecord.framecnt        = self.msgTxCnt
-        self.mpt.map.posRecord.status          = 0  # TBD - Finish
-        self.mpt.map.posRecord.x               = 0.1  # TBD - Finish
-        self.mpt.map.posRecord.y               = 0.2  # TBD - Finish
-        self.mpt.map.posRecord.z               = 0.3  # TBD - Finish
-        self.mpt.map.posRecord.az              = 0.4  # TBD - Finish
-        self.mpt.map.posRecord.el              = 0.5  # TBD - Finish
-        self.mpt.map.posRecord.rot             = 0.6  # TBD - Finish
+        self.mpt.map.posRecord.status          = 0    # TBD - Finish
+        self.mpt.map.posRecord.x               = 0.0  # TBD - Finish
+        self.mpt.map.posRecord.y               = 0.0  # TBD - Finish
+        self.mpt.map.posRecord.z               = 0.0  # TBD - Finish
+        self.mpt.map.posRecord.az              = 0.0  # TBD - Finish
+        self.mpt.map.posRecord.el              = 0.0  # TBD - Finish
+        self.mpt.map.posRecord.rot             = 0.0  # TBD - Finish
         for cnt in range(0, numBoxes):
             self.mpt.map.fifoObjBoxes[cnt].mIsActive = True
-            #centerLr = self.left + (self.right - self.left)/2
-            #centerTb = self.top + (self.bottom - self.top)/2
-            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfo.left + (self.detectInfo.right - self.detectInfo.left)/2)
-            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfo.top + (self.detectInfo.bottom - self.detectInfo.top)/2)
-            self.mpt.map.fifoObjBoxes[cnt].width     = int(self.detectInfo.width)
-            self.mpt.map.fifoObjBoxes[cnt].height    = int(self.detectInfo.height)
-            self.mpt.map.fifoObjBoxes[cnt].classId   = ClassIdType.RED    # TBD
-            self.mpt.map.fifoObjBoxes[cnt].depth     = int(self.detectInfo.distance)
-            self.mpt.map.fifoObjBoxes[cnt].prob      = self.detectInfo.confidence
+            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfoList[cnt].left)
+            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfoList[cnt].top)
+            self.mpt.map.fifoObjBoxes[cnt].width     = int(self.detectInfoList[cnt].width)
+            self.mpt.map.fifoObjBoxes[cnt].height    = int(self.detectInfoList[cnt].height)
+            self.mpt.map.fifoObjBoxes[cnt].classId   = self.detectInfoList[cnt].classId
+            self.mpt.map.fifoObjBoxes[cnt].depth     = int(self.detectInfoList[cnt].distance)
+            self.mpt.map.fifoObjBoxes[cnt].prob      = self.detectInfoList[cnt].confidence
         for cnt in range(0, numMaps):
             self.mpt.map.mapObjs[cnt].mIsActive      = True
-            self.mpt.map.mapObjs[cnt].age            = 20     # TBD
-            self.mpt.map.mapObjs[cnt].classId        = ClassIdType.GOAL    # TBD
-            self.mpt.map.mapObjs[cnt].positionX      = 3.1    # TBD
-            self.mpt.map.mapObjs[cnt].positionY      = 2.2    # TBD
-            self.mpt.map.mapObjs[cnt].positionZ      = 1.3    # TBD
+            self.mpt.map.mapObjs[cnt].age            = 0      # TBD
+            self.mpt.map.mapObjs[cnt].classId        = 0      # TBD
+            self.mpt.map.mapObjs[cnt].positionX      = 0.0    # TBD
+            self.mpt.map.mapObjs[cnt].positionY      = 0.0    # TBD
+            self.mpt.map.mapObjs[cnt].positionZ      = 0.0    # TBD
         #logging.info("createMsgFromDetectInfo - Exit")
 
     def getInstance():
@@ -576,9 +558,7 @@ class VexBrain:
 
     def setNoTargets(self):
         "Indicate there were no targets detected in the last go around."
-        if self.numTargets != 0:
-            #logging.info("Setting numTargets to 0")
-            self.numTargets = 0
+        self.detectInfoList.clear()
 
     def setTestData(self):
         "Set up test data, for debugging protocol with Brain."
@@ -690,10 +670,8 @@ class VexBrain:
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
-                        if self.detectInfo != None:
+                        if len(self.detectInfoList) != 0:
                             self.createMsgFromDetectInfo()
-                            #self.mpt.printVerbose()
-                            #self.detectInfo.displayBrief()
                             packedMsg = self.mpt.getPackedMsg()
                             #if lastMsg != packedMsg:
                             #    logging.info("TX : %s", packedMsg.hex())
@@ -723,4 +701,3 @@ class VexBrain:
         logging.info("--- Thread finishing ---")
         logging.info("------------------------")
         logging.info("")
-
