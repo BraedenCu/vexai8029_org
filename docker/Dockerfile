@@ -77,4 +77,10 @@ RUN python3.8 -m pip install serial
 
 RUN python3.8 -m pip install cupy-cuda102
 
+RUN python3.8 -m pip install pyserial
+
+RUN cd /usr/shared-dev/yolov5
+
+RUN python3.8 VexAiJetson.py
+
 WORKDIR /usr/shared-dev
