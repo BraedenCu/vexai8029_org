@@ -111,6 +111,10 @@ class VexLogic:
                     if blueBalls > redBalls:
                         goalsToDescore.append(goal)
                     
+                    #blue team goals to descore
+                    #if redBalls > blueBalls:
+                    #    goalsToDescore.append(goal)
+                        
                     #if total number of balls in goal is < 3, add it to goals to score array
                     if blueBalls + redBalls < 3:
                         goalsToScore.append(goal)
@@ -163,14 +167,21 @@ class VexLogic:
             if ballsNotInGoals:
                 #find the closestBall ball
                 for b in ballsNotInGoals:
+                    #closest RED ball
                     if closestBall == None or b.distance < closestBall.distance and closestBall.classId == 0: # class id must be red b/c we are on red team to track it
                         closestBall = b
+                    #closest BLUE ball
+                    #if closestBall == None or b.distance < closestBall.distance and closestBall.classId == 1: # class id must be red b/c we are on red team to track it
+                    #    closestBall = b
             else:
                 for b in ballsArr:
                     #logging.info("running")
+                    #closest RED ball
                     if closestBall == None or b.distance < closestBall.distance and closestBall.classId == 0: # class id must be red b/c we are on red team to track it
-                    #logging.info("set this value")
                         closestBall = b
+                    #closest BLUE ball
+                    #if closestBall == None or b.distance < closestBall.distance and closestBall.classId == 1: # class id must be red b/c we are on red team to track it
+                    #    closestBall = b
             
             #closestBall.display()
             #logging.info(closestBall.confidence)
