@@ -34,11 +34,19 @@ REQUIRED DEPENDANCIES FOR PYTORCH / TORCHVISION
 #pip3 install pandas  
 #pip3 install seaborn    
   
-HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE
-sudo apt-get install unzip
+HOW TO DOWNLOAD FILES FROM GOOGLE DRIVE VIA COMMAND LINE  
+sudo apt-get install unzip  
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id={YOURIDHERE}' -r -A 'uc*' -e robots=off -nd  
 {YOURIDHERE} = digits in url after /d/  
 ls -l to find the largest of the three created files  
-mv uc?export=download&confirm=w3R-&id=19aByVTPC1xEMTIuDg7-h__tl2Iy-Bo5U~ runs.zip  change the name to the appropriate name and filetype  
+mv uc?export=download&confirm=w3R-&id=19aByVTPC1xEMTIuDg7-h__tl2Iy-Bo5U~ runs.  zip  change the name to the appropriate name and filetype    
 unzip runs.zip  
 done  :)  
+
+to run a dockercontainer on startup, use the docker --restart=always flag  
+
+another option is to use systemd like this: https://askubuntu.com/questions/620930/how-do-i-autostart-docker-container-at-system-reboot  
+
+more info (https://docs.docker.com/config/containers/start-containers-automatically/)  
+
+
