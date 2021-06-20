@@ -79,11 +79,9 @@ RUN python3.8 -m pip install serial
 
 RUN python3.8 -m pip install pyserial
 
-RUN /bin/bash
-
 WORKDIR /usr/shared-dev/yolov5/
 
-RUN ls
+RUN pwd
 
 RUN python3.8 VexAiJetson.py
 
