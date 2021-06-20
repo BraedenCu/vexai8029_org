@@ -81,6 +81,8 @@ RUN python3.8 -m pip install pyserial
 
 WORKDIR /usr/shared-dev/yolov5
 
+RUN ls
+
 RUN python3.8 VexAiJetson.py
 
 #WORKDIR /usr/shared-dev
