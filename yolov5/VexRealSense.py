@@ -241,34 +241,39 @@ class VexRealSense:
                                 c = int(cls) 
                                 conf = float(conf)
                                 
-                                #process detection if the class is 0 (meaning red ball), 1 = blue ball, 2 = green top
-                                if c == 0 or c==1:
-                                    #only pursue if confidence is greater than 60%
-                                    if conf > 0.7:
-                                        #add to count
-                                        numTargets += 1
-                                        #add detections to detect realsense class
-                                        #class id, confidence
-                                        detectRs = DetectRealSense.DetectionRealsense(c, conf)
-                                        #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        detections.append(detectRs)
-                                        #realsenseObj.addBall(detectRs)
-                                        #detectRs.display()
-                                        
-                                        
-                                #process detection if class if 2 (green top)
-                                if c == 2:
-                                    if conf > 0.4:
-                                        numTargets += 1
-                                        logging.info("detected goal")
-                                        #add detections to detect realsense class
-                                        #class id, confidence
-                                        detectRs = DetectRealSense.DetectionRealsense(c, conf)
-                                        #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
-                                        detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
-                                        detections.append(detectRs)
-                                        #realsenseObj.addGoal(detectRs)
+                                #if the size is less than 20px wide or tall, don't append detection, or if the depth is > 3657.6
+                                if boxw < 20 or boxh < 20 or depth > 3657.6:
+                                    pass
+        
+                                else:
+                                    #process detection if the class is 0 (meaning red ball), 1 = blue ball, 2 = green top
+                                    if c == 0 or c==1:
+                                        #only pursue if confidence is greater than 60%
+                                        if conf > 0.7:
+                                            #add to count
+                                            numTargets += 1
+                                            #add detections to detect realsense class
+                                            #class id, confidence
+                                            detectRs = DetectRealSense.DetectionRealsense(c, conf)
+                                            #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
+                                            detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
+                                            detections.append(detectRs)
+                                            #realsenseObj.addBall(detectRs)
+                                            #detectRs.display()
+                                            
+                                            
+                                    #process detection if class if 2 (green top)
+                                    if c == 2:
+                                        if conf > 0.5:
+                                            numTargets += 1
+                                            logging.info("detected goal")
+                                            #add detections to detect realsense class
+                                            #class id, confidence
+                                            detectRs = DetectRealSense.DetectionRealsense(c, conf)
+                                            #left box, top box, right box, bottom box, box width, height box, distance to object, area of box
+                                            detectRs.setBox(xmin, ymin, xmax, ymax, boxw, boxh, depth, boxarea) 
+                                            detections.append(detectRs)
+                                            #realsenseObj.addGoal(detectRs)
                             
                                 
                                 if view_img == True:
