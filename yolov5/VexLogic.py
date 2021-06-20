@@ -230,9 +230,9 @@ class VexLogic:
                     #logging.info("added2")
                     detectInfoList.append(copy.copy(self.detectInfo))
                 
-            #display detectinfo
-            #if self.detectInfo:
-            #    self.detectInfo.display()
+            #if detectInfo is not empty, add it to vexBrain object
+            if self.detectInfo:
+                self.addDetectList(detectInfoList)
             
             #display elements of detect info list
             #logging.info(len(detectInfoList))
