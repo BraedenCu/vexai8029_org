@@ -79,7 +79,9 @@ RUN python3.8 -m pip install serial
 
 RUN python3.8 -m pip install pyserial
 
-WORKDIR /usr/shared-dev/yolov5/
+VOLUME /home/nano/Development/vexai8029_org
+
+WORKDIR /home/nano/Development/vexai8029_org/yolov5
 
 RUN pwd
 
