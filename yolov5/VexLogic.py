@@ -79,17 +79,17 @@ class VexLogic:
                     #ownership = None
                     #logging.info(d)
                     goal = goalsArr[d]
-                    #gx = int(goal.left + (goal.right - goal.left)/2)
-                    #gy = int(goal.top + (goal.bottom - goal.top)/2)
-                    #gh, gw = goal.height, goal.width
+                    gx = int(goal.left + (goal.right - goal.left)/2)
+                    gy = int(goal.top + (goal.bottom - goal.top)/2)
+                    gh, gw = goal.height, goal.width
                     #logging.info("addedGoalToDescore")
                     
                     for b in ballsArr:
                         bx = int(b.left + (b.right - b.left)/2)
                         by = int(b.top + (b.bottom - b.top)/2)
-                        #if (bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw)):
+                        if ((bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw))) and ((by > (gy - gy) and by < (gy + gy))):
                         #UNTESTED v VERSION using updated goal detection 
-                        if (bx > (goal.left) and bx < (goal.right)) and ((by > goal.bottom) and by < goal.top):
+                        #if (bx > (goal.left) and bx < (goal.right)) and ((by > goal.bottom) and by < goal.top):
                             ballsInGoal.append(b) #add to local list of balls in individual goal being iterated over
                             ballsInGoals.append(b) #add to total list of all balls in goals
                             if b.classId == 0:
@@ -101,12 +101,15 @@ class VexLogic:
                         else:
                             ballsNotInGoals.append(b)
                     
+                    #logging.info(redBalls)
+                    
                     #if more blue than red, descore it if on red team
                     if blueBalls > redBalls:
                         goalsToDescoreRed.append(goal)
                     
                     #blue team goals to descore (if more red balls, descore if on blue team)
                     if redBalls > blueBalls:
+                        #logging.info("added goal")
                         goalsToDescoreBlue.append(goal)
                         
                     #if total number of balls in goal is < 3, add it to goals to score array
@@ -134,7 +137,10 @@ class VexLogic:
                     #for ball in goalContentsArr[d]: 
                     #    if ball.classId == 0: #assuming we are on red
                     #        goalsToDescore
-            
+            else:
+                #no goals, so all balls are appended to ballsNotInGoals
+                for b in ballsArr:
+                    ballsNotInGoals.append(b)
             
             #if we are descoring, find closest ball for each color to descore
             descoring = True
@@ -142,8 +148,7 @@ class VexLogic:
             closestGoalToDescoreRed = None
             closestGoalToDescoreBlue = None
             
-            goalsToDescoreRed = []
-            goalsToDescoreBlue = []
+            #logging.info(len(goalsToDescoreRed))
             
             if descoring == True and goalsToDescoreRed: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
@@ -197,44 +202,38 @@ class VexLogic:
                     #logging.info("added2")
                     detectInfoList.append(copy.copy(self.detectInfo))
             
-  
+            
+            #logging.info(ballsNotInGoals)
+            
             
             #if we are collecting balls
             collectBall = True
             closestBallRed = None
             closestBallBlue = None
             
-            #balls not in goals will only be populated if goals exist, otherwise just use balls
+            #ballsNotInGoals
             if ballsNotInGoals:
+                #logging.info("balls not in goals")
                 #find the closestBall ball
                 for b in ballsNotInGoals: 
                     #closest RED ball
-                    if closestBallRed ==None:
-                        closestBallRed = b
-                    elif (b.distance < closestBallRed.distance) and closestBallRed.classId == 0: # class id must be red b/c we are on red team to track it
-                        closestBallRed = b
+                    if b.classId == 0:
+                        if closestBallRed == None and b.classId == 0:
+                            closestBallRed = b
+                        elif (b.distance < closestBallRed.distance) and (closestBallRed.classId == 0): # class id must be red b/c we are on red team to track it
+                            closestBallRed = b
                     #closest BLUE ball
-                    if closestBallBlue == None: # class id must be red b/c we are on red team to track it
-                        closestBallBlue = b
-                    elif (b.distance < closestBallBlue.distance) and closestBallBlue.classId == 1:
-                        closestBallBlue = b
-            else:
-                for b in ballsArr:
-                    #logging.info("running")
-                    #closest RED ball
-                    if closestBallRed ==None:
-                        closestBallRed = b
-                    elif (b.distance < closestBallRed.distance) and closestBallRed.classId == 0: # class id must be red b/c we are on red team to track it
-                        closestBallRed = b
-                    #closest BLUE ball
-                    if closestBallBlue == None: # class id must be red b/c we are on red team to track it
-                        closestBallBlue = b
-                    elif (b.distance < closestBallBlue.distance) and closestBallBlue.classId == 1:
-                        closestBallBlue = b
+                    if b.classId == 1:
+                        if closestBallBlue == None and b.classId == 1: # class id must be red b/c we are on red team to track it
+                            closestBallBlue = b
+                        elif (b.distance < closestBallBlue.distance) and (closestBallBlue.classId == 1):
+                            closestBallBlue = b
+
             
             #add red balls
-            if collectBall and closestBallRed!=None: #if closest ball is not == none and we are supposed to be collecting balls
+            if collectBall and closestBallRed: #if closest ball is not == none and we are supposed to be collecting balls
                 #send ball to collect coordinate
+                #logging.info("added red ball")
                 self.detectInfo.confidence = closestBallRed.confidence
                 self.detectInfo.left       = closestBallRed.left
                 self.detectInfo.top        = closestBallRed.top
@@ -246,7 +245,6 @@ class VexLogic:
                 self.detectInfo.area       = closestBallRed.area
                 self.detectInfo.classId    = 10 #collect red ball
                 
-                #logging.info("added")
                 detectInfoList.append(copy.copy(self.detectInfo))
             
             #add blue balls
@@ -329,9 +327,9 @@ class VexLogic:
                 self.detectInfoList = detectInfoList
             
             #display elements of detect info list
-            logging.info(len(detectInfoList))
-            #for detect in detectInfoList:
-                #detect.display()
+            #logging.info(len(detectInfoList))
+            for detect in detectInfoList:
+                detect.display()
         
     def setInstances(self, vb, vf, vr):
         "TBD"

@@ -16,8 +16,8 @@ class DetectInfo:
                                   #20 = closest blue ball not in goal
                                   #30 = blue/red goal to score
                                   #40 = blue/red goal score
-                                  #50 = red goal descore
-                                  #60 = blue goal descore
+                                  #50 = red goal descore (closestGoalToDescoreRed)
+                                  #60 = blue goal descore (closestGoalToDescoreBlue)
         self.confidence = confidence
         self.left       = 0.0
         self.top        = 0.0
