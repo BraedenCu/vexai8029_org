@@ -43,24 +43,25 @@ class VexLogic:
         closest = None
         #0.7 = confidence, just a random value 
         detectInfo = DetectInfo.DetectInfo(outputId, 0.7)
-        for b in arr:
-            if closest == None:
-                closest = b
-            else:
-                if closest.distance > b.distance:
+        if arr:
+            for b in arr:
+                if closest == None:
                     closest = b
-        
-        if closest!=None:
-            detectInfo.confidence = closest.confidence
-            detectInfo.left       = closest.left
-            detectInfo.top        = closest.top
-            detectInfo.right      = closest.right
-            detectInfo.bottom     = closest.bottom
-            detectInfo.width      = closest.width
-            detectInfo.height     = closest.height
-            detectInfo.distance   = closest.distance
-            detectInfo.area       = closest.area
-            detectInfo.classId    = outputId
+                else:
+                    if closest.distance > b.distance:
+                        closest = b
+            
+            if closest!=None:
+                detectInfo.confidence = closest.confidence
+                detectInfo.left       = closest.left
+                detectInfo.top        = closest.top
+                detectInfo.right      = closest.right
+                detectInfo.bottom     = closest.bottom
+                detectInfo.width      = closest.width
+                detectInfo.height     = closest.height
+                detectInfo.distance   = closest.distance
+                detectInfo.area       = closest.area
+                detectInfo.classId    = outputId
                             
         #create detect info object and return detect info object
         return detectInfo
