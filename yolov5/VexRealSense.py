@@ -82,7 +82,7 @@ class VexRealSense:
             parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
             opt = parser.parse_args()
             
-            source, weights, view_img, imgsz = '0', 'runs/train/finGoalWeights2/weights/last.pt', 0, 640
+            source, weights, view_img, imgsz = '0', 'runs/train/goals8/weights/last.pt', 0, 640   
             source, weights, view_img, save_txt, imgsz = '0', weights, view_img, False, 640
             save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
             #maximum number of detections per image = 1000
@@ -264,7 +264,7 @@ class VexRealSense:
                                             
                                     #process detection if class if 2 (green top)
                                     if c == 2:
-                                        if conf > 0.5:
+                                        if conf > 0.7:
                                             numTargets += 1
                                             #logging.info("detected goal")
                                             #add detections to detect realsense class
@@ -291,7 +291,7 @@ class VexRealSense:
                         self.vexLogic.setDetectInfoArray(detections)
                 
                     # Print time (inference + NMS)
-                    #logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
+                    logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
 
                     # Stream results
