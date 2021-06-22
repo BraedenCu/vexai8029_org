@@ -278,7 +278,7 @@ class VexLogic:
                 self.detectInfoList = detectInfoList
             
             #display elements of detect info list
-            for detect in self.detectInfoList:
+            #for detect in self.detectInfoList:
                 #detect.display()
         
         
