@@ -264,7 +264,7 @@ class VexRealSense:
                                             
                                     #process detection if class if 2 (green top)
                                     if c == 2:
-                                        if conf > 0.7:
+                                        if conf > 0.5:
                                             numTargets += 1
                                             #logging.info("detected goal")
                                             #add detections to detect realsense class
@@ -291,7 +291,7 @@ class VexRealSense:
                         self.vexLogic.setDetectInfoArray(detections)
                 
                     # Print time (inference + NMS)
-                    logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
+                    #logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
 
                     # Stream results

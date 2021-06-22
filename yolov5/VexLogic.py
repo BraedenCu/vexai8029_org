@@ -197,14 +197,14 @@ class VexLogic:
                         
             if descoring and goalsToDescoreRed: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
-                detectinfo = self.determineClosest(goalsToDescoreRed, 31)
+                detectinfo = self.determineClosest(goalsToDescoreRed, 32)
                 detectInfoList.append(copy.copy(detectinfo))
                 #detectinfo.display()
                 
                 
             if descoring and goalsToDescoreBlue: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
-                detectinfo = self.determineClosest(goalsToDescoreBlue, 32)
+                detectinfo = self.determineClosest(goalsToDescoreBlue, 33)
                 detectInfoList.append(copy.copy(detectinfo))
                 #detectinfo.display()
 
