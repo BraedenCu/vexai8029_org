@@ -317,10 +317,10 @@ class VexLogic:
         with self.lock:
             if self.numTargets == 0 or self.detectInfoList == None:
                 #print("brain has no targets")
-                #logging.info("brain has no targets")
+                logging.info("brain has no targets")
                 self.brain.setNoTargets()
             else:
-                #self.detectInfo.display()
+                #self.detectInfoList[0].display()
                 #self.detectInfo.displayBrief()
                 self.brain.addDetectList(self.detectInfoList)
 

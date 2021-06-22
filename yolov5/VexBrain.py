@@ -502,7 +502,7 @@ class VexBrain:
         self.detectInfoList.clear()
         for detect in diList :
             self.detectInfoList.append(detect)
-            #detect.display()
+            detect.display()
 
     def addMap(self):
         "TBD"
@@ -514,13 +514,12 @@ class VexBrain:
 
     def createMsgFromDetectInfo(self):
         "Build a message to send to the VEX Cortex Brain, based on detect info."
-        logging.info("createMsgFromDetectInfo - Enter")
+        #logging.info("createMsgFromDetectInfo - Enter")
         self.clearMsg()
         #self.setTestData2()
         #self.setTestData3()
         #self.setTestData4()
         numBoxes = len(self.detectInfoList)
-        logging.info(numBoxes)
         numMaps  = 0   # TBD - Use actual number
         self.mpt.map.boxnum                    = numBoxes
         self.mpt.map.mapnum                    = numMaps
@@ -533,9 +532,12 @@ class VexBrain:
         self.mpt.map.posRecord.el              = 0.0  # TBD - Finish
         self.mpt.map.posRecord.rot             = 0.0  # TBD - Finish
         for cnt in range(0, numBoxes):
+            centerX = self.detectInfoList[cnt].left + (self.detectInfoList[cnt].width / 2)
+            centerY = self.detectInfoList[cnt].top  + (self.detectInfoList[cnt].height / 2)
             self.mpt.map.fifoObjBoxes[cnt].mIsActive = True
-            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfo.left + (self.detectInfo.right - self.detectInfo.left)/2)
-            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfo.top + (self.detectInfo.bottom - self.detectInfo.top)/2)
+            self.mpt.map.fifoObjBoxes[cnt].x         = int(centerX)
+            self.mpt.map.fifoObjBoxes[cnt].y         = int(centerY)
+            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfoList[cnt].top)
             self.mpt.map.fifoObjBoxes[cnt].width     = int(self.detectInfoList[cnt].width)
             self.mpt.map.fifoObjBoxes[cnt].height    = int(self.detectInfoList[cnt].height)
             self.mpt.map.fifoObjBoxes[cnt].classId   = self.detectInfoList[cnt].classId
@@ -668,7 +670,7 @@ class VexBrain:
                 data = self.brain.readline()
                 if data:
                     self.msgRxCnt += 1
-                    logging.info("RX : %04d %s", self.msgRxCnt, data)
+                    #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
                         if len(self.detectInfoList) != 0:
