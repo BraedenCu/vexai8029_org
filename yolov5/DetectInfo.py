@@ -11,13 +11,15 @@ class DetectInfo:
 
     def __init__(self, classId, confidence):
         "Constructor for this object."
-        self.classId    = classId #10 = closest red ball not in goal 
-                                  #11 = closest ball IN goal
-                                  #20 = closest blue ball not in goal
+        self.classId    = classId #0  = undefined
+                                  #10 = closest red ball OUTSIDE goal
+                                  #11 = closest red ball IN goal
+                                  #20 = closest blue ball OUTSIDE goal
+                                  #21 = closest blue ball IN goal
                                   #30 = blue/red goal to score
-                                  #40 = blue/red goal score
-                                  #50 = red goal descore (closestGoalToDescoreRed)
-                                  #60 = blue goal descore (closestGoalToDescoreBlue)
+                                  #31 = red goal to descore (closestGoalToDescoreRed)
+                                  #32 = blue goal to descore (closestGoalToDescoreBlue)
+
         self.confidence = confidence
         self.left       = 0.0
         self.top        = 0.0

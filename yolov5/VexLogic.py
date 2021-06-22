@@ -161,7 +161,7 @@ class VexLogic:
                         if closestGoalToDescoreRed.distance > goal.distance:
                             closestGoalToDescoreRed = goal
                     
-                #set detectInfo detection to closest goal to send to cortex
+                #set detectInfo detection to closest red goal to descore to send to cortex
                 if closestGoalToDescoreRed!=None:
                     self.detectInfo.confidence = closestGoalToDescoreRed.confidence
                     self.detectInfo.left       = closestGoalToDescoreRed.left
@@ -172,7 +172,7 @@ class VexLogic:
                     self.detectInfo.height     = closestGoalToDescoreRed.height
                     self.detectInfo.distance   = closestGoalToDescoreRed.distance
                     self.detectInfo.area       = closestGoalToDescoreRed.area
-                    self.detectInfo.classId    = 50
+                    self.detectInfo.classId    = 31
                     #logging.info("added2")
                     detectInfoList.append(copy.copy(self.detectInfo))
             
@@ -198,7 +198,7 @@ class VexLogic:
                     self.detectInfo.height     = closestGoalToDescoreBlue.height
                     self.detectInfo.distance   = closestGoalToDescoreBlue.distance
                     self.detectInfo.area       = closestGoalToDescoreBlue.area
-                    self.detectInfo.classId    = 60 # blue goal descore
+                    self.detectInfo.classId    = 32 # blue goal descore
                     #logging.info("added2")
                     detectInfoList.append(copy.copy(self.detectInfo))
             
@@ -297,27 +297,50 @@ class VexLogic:
                 
                 
             #find the closest ball IN a goal and add it to the detect info list
-            closestBallInGoal = None
+            closestBallInGoalRed = None
+            closestBallInGoalBlue = None
             if ballsInGoals:
                 for b in ballsInGoals:
-                    if closestBallInGoal==None:
-                        closestBallInGoal = b
-                    else:
-                        if closestBallInGoal.distance > b.distance:
-                            closestBallInGoal = b
+                    if b.classId == 0: #red
+                        if closestBallInGoalRed==None:
+                            closestBallInGoalRed = b
+                        else:
+                            if closestBallInGoalRed.distance > b.distance:
+                                closestBallInGoalRed = b
+                    elif b.classId == 1:
+                        if closestBallInGoalBlue==None:
+                            closestBallInGoalBlue = b
+                        else:
+                            if closestBallInGoalBlue.distance > b.distance:
+                                closestBallInGoalBlue = b
                             
-                if closestBallInGoal:
-                    #set closest ball in goal value
-                    self.detectInfo.confidence = closestBallInGoal.confidence
-                    self.detectInfo.left       = closestBallInGoal.left
-                    self.detectInfo.top        = closestBallInGoal.top
-                    self.detectInfo.right      = closestBallInGoal.right
-                    self.detectInfo.bottom     = closestBallInGoal.bottom
-                    self.detectInfo.width      = closestBallInGoal.width
-                    self.detectInfo.height     = closestBallInGoal.height
-                    self.detectInfo.distance   = closestBallInGoal.distance
-                    self.detectInfo.area       = closestBallInGoal.area
-                    self.detectInfo.classId    = 11 #score red ball / blue ball
+                if closestBallInGoalRed:
+                    #set closest red ball in goal value
+                    self.detectInfo.confidence = closestBallInGoalRed.confidence
+                    self.detectInfo.left       = closestBallInGoalRed.left
+                    self.detectInfo.top        = closestBallInGoalRed.top
+                    self.detectInfo.right      = closestBallInGoalRed.right
+                    self.detectInfo.bottom     = closestBallInGoalRed.bottom
+                    self.detectInfo.width      = closestBallInGoalRed.width
+                    self.detectInfo.height     = closestBallInGoalRed.height
+                    self.detectInfo.distance   = closestBallInGoalRed.distance
+                    self.detectInfo.area       = closestBallInGoalRed.area
+                    self.detectInfo.classId    = 11 #closest red ball in goal
+                    #logging.info("added2")
+                    detectInfoList.append(copy.copy(self.detectInfo))
+                
+                if closestBallInGoalBlue:
+                    #set closest blue ball in goal value
+                    self.detectInfo.confidence = closestBallInGoalBlue.confidence
+                    self.detectInfo.left       = closestBallInGoalBlue.left
+                    self.detectInfo.top        = closestBallInGoalBlue.top
+                    self.detectInfo.right      = closestBallInGoalBlue.right
+                    self.detectInfo.bottom     = closestBallInGoalBlue.bottom
+                    self.detectInfo.width      = closestBallInGoalBlue.width
+                    self.detectInfo.height     = closestBallInGoalBlue.height
+                    self.detectInfo.distance   = closestBallInGoalBlue.distance
+                    self.detectInfo.area       = closestBallInGoalBlue.area
+                    self.detectInfo.classId    = 21 #closest red ball in goal
                     #logging.info("added2")
                     detectInfoList.append(copy.copy(self.detectInfo))
             
