@@ -61,9 +61,9 @@ def spliceIntoFrames(parentPath, inputVideoPath, outputPath):
     cap = cv2.VideoCapture(inputVideoPath)
     #save one image every 1000 frames
 
-    frameIndexes = 67
+    frameIndexes = 45
     iteration = 1
-    name = 313
+    name = 525
     while(cap.isOpened()):
         #ret is a bool that returns true if a frame is found
         #frame returns the frame
@@ -86,6 +86,6 @@ if __name__ == "__main__":
     #setupOutputDirectories(parentPath)
     #copyFile('output.avi', 'outputCopy.avi')
     inputVideoPath = parentPath + 'output.avi'
-    outputPath = parentPath + 'testImages'
+    outputPath = parentPath + 'testImages/images'
     spliceIntoFrames(parentPath, inputVideoPath, outputPath)
     print("Task completed")
