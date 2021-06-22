@@ -291,7 +291,7 @@ class VexRealSense:
                         self.vexLogic.setDetectInfoArray(detections)
                 
                     # Print time (inference + NMS)
-                    logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
+                    #logging.info(f'{s}Done. ({t2 - t1:.3f}s)')
                     
 
                     # Stream results

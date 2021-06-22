@@ -502,7 +502,7 @@ class VexBrain:
         self.detectInfoList.clear()
         for detect in diList :
             self.detectInfoList.append(detect)
-            detect.display()
+            #detect.display()
 
     def addMap(self):
         "TBD"
@@ -520,6 +520,7 @@ class VexBrain:
         #self.setTestData3()
         #self.setTestData4()
         numBoxes = len(self.detectInfoList)
+        logging.info(numBoxes)
         numMaps  = 0   # TBD - Use actual number
         self.mpt.map.boxnum                    = numBoxes
         self.mpt.map.mapnum                    = numMaps
@@ -667,7 +668,7 @@ class VexBrain:
                 data = self.brain.readline()
                 if data:
                     self.msgRxCnt += 1
-                    #logging.info("RX : %04d %s", self.msgRxCnt, data)
+                    logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
                         if len(self.detectInfoList) != 0:

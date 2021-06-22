@@ -68,11 +68,7 @@ class VexLogic:
             
             
             
-            
-            
-            
-            
-
+        
 
     def setDetectInfoArray(self, detections):
         if self.numTargets == 0:
