@@ -39,69 +39,112 @@ class VexLogic:
         return VexLogic.__instance
 
 
+    def determineClosest(self, arr, outputId):
+        closest = None
+        #0.7 = confidence, just a random value 
+        detectInfo = DetectInfo.DetectInfo(outputId, 0.7)
+        for b in arr:
+            if closest == None:
+                closest = b
+            else:
+                if closest.distance > b.distance:
+                    closest = b
+        
+        if closest!=None:
+            detectInfo.confidence = closest.confidence
+            detectInfo.left       = closest.left
+            detectInfo.top        = closest.top
+            detectInfo.right      = closest.right
+            detectInfo.bottom     = closest.bottom
+            detectInfo.width      = closest.width
+            detectInfo.height     = closest.height
+            detectInfo.distance   = closest.distance
+            detectInfo.area       = closest.area
+            detectInfo.classId    = outputId
+                            
+        #create detect info object and return detect info object
+        return detectInfo
+            
+            
+            
+            
+            
+            
+            
+
+
     def setDetectInfoArray(self, detections):
         if self.numTargets == 0:
             logging.info("Setting numTargets to 1")
             self.numTargets = 1
-            
+        
+        #dont really understand this or the above code
         if self.detectInfo == None:
             self.detectInfo = DetectInfo.DetectInfo(detections[0].classId, detections[0].confidence)
-        
         else:    
             goalsArr = [] #Goals
             ballsArr = [] #all balls
-            ballsNotInGoals = [] #balls not in goals
-            ballsInGoals = []
+            blueBalls = []
+            redBalls = []
+            redBallsNotInGoals = [] #balls not in goals
+            blueBallsNotInGoals = [] #balls not in goals
+            redBallsInGoals = [] 
+            blueBallsInGoals = []
             goalContentsArr = [] #2d array containing the ball contents of the goal arrays (indexed in the same way as goals arr)
             goalsToDescoreRed = []
             goalsToDescoreBlue = []
             goalsToScore = []
-            detectInfoList = []
+            detectInfoList = [] # list of all detections to be sent to brain
             
             #populate arrays
             for det in detections:
-                #det.display()
-                if det.classId == 0 or det.classId == 1: 
+                
+                if det.classId == 0: 
                     ballsArr.append(det)
-                    
+                    redBalls.append(det)
+                elif det.classId == 1:
+                    ballsArr.append(det)
+                    blueBalls.append(det)
                 elif det.classId == 2:
                     goalsArr.append(det)
             
             #iterate over goals to determine balls in goal and add those balls to goal datastructure   
-            #logging.info(goalsArr)    
             if goalsArr:
-                #logging.info("got here")
                 for d in range(0, len(goalsArr)):
-                    #logging.info("iterating over goals")
-                    redBalls = 0
-                    blueBalls = 0
+                    redBalls = 0 # total red balls in goal
+                    blueBalls = 0 # total blue balls in goal
                     ballsInGoal = []
-                    #ownership = None
-                    #logging.info(d)
+
                     goal = goalsArr[d]
                     gx = int(goal.left + (goal.right - goal.left)/2)
                     gy = int(goal.top + (goal.bottom - goal.top)/2)
                     gh, gw = goal.height, goal.width
-                    #logging.info("addedGoalToDescore")
                     
                     for b in ballsArr:
                         bx = int(b.left + (b.right - b.left)/2)
                         by = int(b.top + (b.bottom - b.top)/2)
+                        
                         if ((bx > (gx - 0.5*gw) and bx < (gx + 0.5*gw))) and ((by > (gy - gy) and by < (gy + gy))):
                         #UNTESTED v VERSION using updated goal detection 
                         #if (bx > (goal.left) and bx < (goal.right)) and ((by > goal.bottom) and by < goal.top):
+                            #BALL IS IN GOAL
                             ballsInGoal.append(b) #add to local list of balls in individual goal being iterated over
-                            ballsInGoals.append(b) #add to total list of all balls in goals
+
                             if b.classId == 0:
+                                redBallsInGoals.append(b) #add to total list of all red balls in goals
                                 redBalls+=1
+                                
                             elif b.classId == 1:
-                                blueBalls+=1
-                            #logging.info("ball in goal")
-                            #REMOVE BALL FROM REGULAR BALL CALCULATION (dont want bot going after balls in goals)
+                                blueBallsInGoals.append(b) #add to total list of all blue balls in goals
+                                blueBalls+=1 
+                        
                         else:
-                            ballsNotInGoals.append(b)
-                    
-                    #logging.info(redBalls)
+                            #BALL IS NOT IN GOAL, DO NOT ADD TO GOAL TOTALS
+                            if b.classId == 0:
+                                redBallsNotInGoals.append(b) #add to total list of all red balls NOT in goals
+                                
+                            elif b.classId == 1:
+                                blueBallsNotInGoals.append(b) #add to total list of all blue balls NOT in goals                    
                     
                     #if more blue than red, descore it if on red team
                     if blueBalls > redBalls:
@@ -121,7 +164,7 @@ class VexLogic:
                     topBall = None
                     middleBall = None
                     bottomBall = None
-                    #logging.info(ballsInGoal)
+
                     for i in ballsInGoal: 
                         if topBall==None or i.top > topBall.top:
                             topBall = i
@@ -132,228 +175,111 @@ class VexLogic:
                     
                     goalContentsArr.append([topBall, middleBall, bottomBall])
                     
-                    #check if we should descore this goal, and if so, append it to the to descore array in the format [0, 1, 0]
-                    #1 means take ball out of goal, 0 means it is your teams color so leave it in. [-1, 0, 1] -1 means no ball is there
-                    #for ball in goalContentsArr[d]: 
-                    #    if ball.classId == 0: #assuming we are on red
-                    #        goalsToDescore
+            
             else:
                 #no goals, so all balls are appended to ballsNotInGoals
                 for b in ballsArr:
-                    ballsNotInGoals.append(b)
+                    #BALL IS NOT IN GOAL, DO NOT ADD TO GOAL TOTALS
+                    if b.classId == 0:
+                        redBallsNotInGoals.append(b) #add to total list of all red balls NOT in goals
+                        
+                    elif b.classId == 1:
+                        blueBallsNotInGoals.append(b) #add to total list of all blue balls NOT in goals      
+            
             
             #if we are descoring, find closest ball for each color to descore
             descoring = True
+                        
+            if descoring and goalsToDescoreRed: #goals to score need to be detected to score
+                #find closest goal, and go towards it 
+                detectinfo = self.determineClosest(goalsToDescoreRed, 31)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
+                
+                
+            if descoring and goalsToDescoreBlue: #goals to score need to be detected to score
+                #find closest goal, and go towards it 
+                detectinfo = self.determineClosest(goalsToDescoreBlue, 32)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
 
-            closestGoalToDescoreRed = None
-            closestGoalToDescoreBlue = None
-            
-            #logging.info(len(goalsToDescoreRed))
-            
-            if descoring == True and goalsToDescoreRed: #goals to score need to be detected to score
-                #find closest goal, and go towards it 
-                #logging.info("running")
-                #logging.info(len(goalsToScore))
-                for goal in goalsToDescoreRed:
-                    if closestGoalToDescoreRed == None:
-                        closestGoalToDescoreRed = goal
-                    else:
-                        if closestGoalToDescoreRed.distance > goal.distance:
-                            closestGoalToDescoreRed = goal
-                    
-                #set detectInfo detection to closest red goal to descore to send to cortex
-                if closestGoalToDescoreRed!=None:
-                    self.detectInfo.confidence = closestGoalToDescoreRed.confidence
-                    self.detectInfo.left       = closestGoalToDescoreRed.left
-                    self.detectInfo.top        = closestGoalToDescoreRed.top
-                    self.detectInfo.right      = closestGoalToDescoreRed.right
-                    self.detectInfo.bottom     = closestGoalToDescoreRed.bottom
-                    self.detectInfo.width      = closestGoalToDescoreRed.width
-                    self.detectInfo.height     = closestGoalToDescoreRed.height
-                    self.detectInfo.distance   = closestGoalToDescoreRed.distance
-                    self.detectInfo.area       = closestGoalToDescoreRed.area
-                    self.detectInfo.classId    = 31
-                    #logging.info("added2")
-                    detectInfoList.append(copy.copy(self.detectInfo))
-            
-            if descoring == True and goalsToDescoreBlue: #goals to score need to be detected to score
-                #find closest goal, and go towards it 
-                #logging.info("running")
-                #logging.info(len(goalsToScore))
-                for goal in goalsToDescoreBlue:
-                    if closestGoalToDescoreBlue == None:
-                        closestGoalToDescoreBlue = goal
-                    else:
-                        if closestGoalToDescoreBlue.distance > goal.distance:
-                            closestGoalToDescoreBlue = goal
-                    
-                #set detectInfo detection to closest goal to send to cortex
-                if closestGoalToDescoreBlue!=None:
-                    self.detectInfo.confidence = closestGoalToDescoreBlue.confidence
-                    self.detectInfo.left       = closestGoalToDescoreBlue.left
-                    self.detectInfo.top        = closestGoalToDescoreBlue.top
-                    self.detectInfo.right      = closestGoalToDescoreBlue.right
-                    self.detectInfo.bottom     = closestGoalToDescoreBlue.bottom
-                    self.detectInfo.width      = closestGoalToDescoreBlue.width
-                    self.detectInfo.height     = closestGoalToDescoreBlue.height
-                    self.detectInfo.distance   = closestGoalToDescoreBlue.distance
-                    self.detectInfo.area       = closestGoalToDescoreBlue.area
-                    self.detectInfo.classId    = 32 # blue goal descore
-                    #logging.info("added2")
-                    detectInfoList.append(copy.copy(self.detectInfo))
-            
-            
-            #logging.info(ballsNotInGoals)
-            
-            
             #if we are collecting balls
             collectBall = True
-            closestBallRed = None
-            closestBallBlue = None
             
-            #ballsNotInGoals
-            if ballsNotInGoals:
-                #logging.info("balls not in goals")
-                #find the closestBall ball
-                for b in ballsNotInGoals: 
-                    #closest RED ball
-                    if b.classId == 0:
-                        if closestBallRed == None and b.classId == 0:
-                            closestBallRed = b
-                        elif (b.distance < closestBallRed.distance) and (closestBallRed.classId == 0): # class id must be red b/c we are on red team to track it
-                            closestBallRed = b
-                    #closest BLUE ball
-                    if b.classId == 1:
-                        if closestBallBlue == None and b.classId == 1: # class id must be red b/c we are on red team to track it
-                            closestBallBlue = b
-                        elif (b.distance < closestBallBlue.distance) and (closestBallBlue.classId == 1):
-                            closestBallBlue = b
-
+            if collectBall and redBallsNotInGoals:
+                #find the closest red ball not in goal
+                detectinfo = self.determineClosest(redBallsNotInGoals, 11)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
             
-            #add red balls
-            if collectBall and closestBallRed: #if closest ball is not == none and we are supposed to be collecting balls
-                #send ball to collect coordinate
-                #logging.info("added red ball")
-                self.detectInfo.confidence = closestBallRed.confidence
-                self.detectInfo.left       = closestBallRed.left
-                self.detectInfo.top        = closestBallRed.top
-                self.detectInfo.right      = closestBallRed.right
-                self.detectInfo.bottom     = closestBallRed.bottom
-                self.detectInfo.width      = closestBallRed.width
-                self.detectInfo.height     = closestBallRed.height
-                self.detectInfo.distance   = closestBallRed.distance
-                self.detectInfo.area       = closestBallRed.area
-                self.detectInfo.classId    = 10 #collect red ball
-                
-                detectInfoList.append(copy.copy(self.detectInfo))
+            if collectBall and blueBallsNotInGoals:
+                #find the closest blue ball not in goal
+                detectinfo = self.determineClosest(blueBallsNotInGoals, 21)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
             
-            #add blue balls
-            if collectBall and closestBallBlue!=None: #if closest ball is not == none and we are supposed to be collecting balls
-                #send ball to collect coordinate
-                self.detectInfo.confidence = closestBallBlue.confidence
-                self.detectInfo.left       = closestBallBlue.left
-                self.detectInfo.top        = closestBallBlue.top
-                self.detectInfo.right      = closestBallBlue.right
-                self.detectInfo.bottom     = closestBallBlue.bottom
-                self.detectInfo.width      = closestBallBlue.width
-                self.detectInfo.height     = closestBallBlue.height
-                self.detectInfo.distance   = closestBallBlue.distance
-                self.detectInfo.area       = closestBallBlue.area
-                self.detectInfo.classId    = 20 #collect blue ball
-                #logging.info("added")
-                detectInfoList.append(copy.copy(self.detectInfo))
-                
-                 
+                   
             #find the closest goal for each team and send it to the brain
             #if we have a ball in our robot and need to score
             scoringBall = True
             closestGoal = None
             
-            if scoringBall == True and goalsToScore!=None: #goals to score need to be detected to score
+            if scoringBall and goalsToScore: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
                 #logging.info("running")
                 #logging.info(len(goalsToScore))
-                for goal in goalsToScore:
-                    if closestGoal == None:
-                        closestGoal = goal
-                    else:
-                        if closestGoal.distance > goal.distance:
-                            closestGoal = goal
-                    
-                #set detectInfo detection to closest goal to send to cortex
-                if closestGoal!=None:
-                    self.detectInfo.confidence = closestGoal.confidence
-                    self.detectInfo.left       = closestGoal.left
-                    self.detectInfo.top        = closestGoal.top
-                    self.detectInfo.right      = closestGoal.right
-                    self.detectInfo.bottom     = closestGoal.bottom
-                    self.detectInfo.width      = closestGoal.width
-                    self.detectInfo.height     = closestGoal.height
-                    self.detectInfo.distance   = closestGoal.distance
-                    self.detectInfo.area       = closestGoal.area
-                    self.detectInfo.classId    = 30 #score red ball / blue ball
-                    #logging.info("added2")
-                    detectInfoList.append(copy.copy(self.detectInfo))
+                detectinfo = self.determineClosest(goalsToScore, 31)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
                 
-                
+        
             #find the closest ball IN a goal and add it to the detect info list
-            closestBallInGoalRed = None
-            closestBallInGoalBlue = None
-            if ballsInGoals:
-                for b in ballsInGoals:
-                    if b.classId == 0: #red
-                        if closestBallInGoalRed==None:
-                            closestBallInGoalRed = b
-                        else:
-                            if closestBallInGoalRed.distance > b.distance:
-                                closestBallInGoalRed = b
-                    elif b.classId == 1:
-                        if closestBallInGoalBlue==None:
-                            closestBallInGoalBlue = b
-                        else:
-                            if closestBallInGoalBlue.distance > b.distance:
-                                closestBallInGoalBlue = b
-                            
-                if closestBallInGoalRed:
-                    #set closest red ball in goal value
-                    self.detectInfo.confidence = closestBallInGoalRed.confidence
-                    self.detectInfo.left       = closestBallInGoalRed.left
-                    self.detectInfo.top        = closestBallInGoalRed.top
-                    self.detectInfo.right      = closestBallInGoalRed.right
-                    self.detectInfo.bottom     = closestBallInGoalRed.bottom
-                    self.detectInfo.width      = closestBallInGoalRed.width
-                    self.detectInfo.height     = closestBallInGoalRed.height
-                    self.detectInfo.distance   = closestBallInGoalRed.distance
-                    self.detectInfo.area       = closestBallInGoalRed.area
-                    self.detectInfo.classId    = 11 #closest red ball in goal
-                    #logging.info("added2")
-                    detectInfoList.append(copy.copy(self.detectInfo))
-                
-                if closestBallInGoalBlue:
-                    #set closest blue ball in goal value
-                    self.detectInfo.confidence = closestBallInGoalBlue.confidence
-                    self.detectInfo.left       = closestBallInGoalBlue.left
-                    self.detectInfo.top        = closestBallInGoalBlue.top
-                    self.detectInfo.right      = closestBallInGoalBlue.right
-                    self.detectInfo.bottom     = closestBallInGoalBlue.bottom
-                    self.detectInfo.width      = closestBallInGoalBlue.width
-                    self.detectInfo.height     = closestBallInGoalBlue.height
-                    self.detectInfo.distance   = closestBallInGoalBlue.distance
-                    self.detectInfo.area       = closestBallInGoalBlue.area
-                    self.detectInfo.classId    = 21 #closest red ball in goal
-                    #logging.info("added2")
-                    detectInfoList.append(copy.copy(self.detectInfo))
+            findclosestballingoal = True
             
+            if findclosestballingoal:
+                #find closest ball in goal
+                if blueBallsInGoals:
+                    detectinfo = self.determineClosest(blueBallsInGoals, 22)
+                    detectInfoList.append(copy.copy(detectinfo))
+                    detectinfo.display()
+                if redBallsInGoals:
+                    detectinfo = self.determineClosest(redBallsInGoals, 12)
+                    detectInfoList.append(copy.copy(detectinfo))
+                    detectinfo.display()
             
+            #find the closest generic ball
+            findclosestgenericball = True
+            
+            if findclosestgenericball:
+                #find closest ball in goal
+                if blueBalls:
+                    detectinfo = self.determineClosest(blueBalls, 20)
+                    detectInfoList.append(copy.copy(detectinfo))
+                    detectinfo.display()
+                if redBalls:
+                    detectinfo = self.determineClosest(redBalls, 10)
+                    detectInfoList.append(copy.copy(detectinfo))
+                    detectinfo.display()
+            
+            #find the closest generic goal
+            if goalsArr:
+                detectinfo = self.determineClosest(goalsArr, 30)
+                detectInfoList.append(copy.copy(detectinfo))
+                detectinfo.display()
+                       
             #if detectInfo is not empty, add it to vexBrain object
             if self.detectInfo:
                 self.detectInfoList = detectInfoList
             
             #display elements of detect info list
-            #logging.info(len(detectInfoList))
-            for detect in detectInfoList:
+            for detect in self.detectInfoList:
                 detect.display()
         
+        
+        
+        
+        
+
     def setInstances(self, vb, vf, vr):
         "TBD"
         logging.info("VexLogic.setInstances()")
