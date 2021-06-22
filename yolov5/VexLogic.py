@@ -85,8 +85,8 @@ class VexLogic:
         else:    
             goalsArr = [] #Goals
             ballsArr = [] #all balls
-            blueBalls = []
-            redBalls = []
+            blueBallsArr = []
+            redBallsArr = []
             redBallsNotInGoals = [] #balls not in goals
             blueBallsNotInGoals = [] #balls not in goals
             redBallsInGoals = [] 
@@ -102,10 +102,10 @@ class VexLogic:
                 
                 if det.classId == 0: 
                     ballsArr.append(det)
-                    redBalls.append(det)
+                    redBallsArr.append(det)
                 elif det.classId == 1:
                     ballsArr.append(det)
-                    blueBalls.append(det)
+                    blueBallsArr.append(det)
                 elif det.classId == 2:
                     goalsArr.append(det)
             
@@ -133,19 +133,23 @@ class VexLogic:
 
                             if b.classId == 0:
                                 redBallsInGoals.append(b) #add to total list of all red balls in goals
+                                #redBallsArr.append(b)
                                 redBalls+=1
                                 
                             elif b.classId == 1:
                                 blueBallsInGoals.append(b) #add to total list of all blue balls in goals
+                                #blueBallsArr.append(b)
                                 blueBalls+=1 
                         
                         else:
                             #BALL IS NOT IN GOAL, DO NOT ADD TO GOAL TOTALS
                             if b.classId == 0:
                                 redBallsNotInGoals.append(b) #add to total list of all red balls NOT in goals
+                                redBallsArr.append(b)
                                 
                             elif b.classId == 1:
-                                blueBallsNotInGoals.append(b) #add to total list of all blue balls NOT in goals                    
+                                blueBallsNotInGoals.append(b) #add to total list of all blue balls NOT in goals  
+                                blueBallsArr.append(b)                  
                     
                     #if more blue than red, descore it if on red team
                     if blueBalls > redBalls:
@@ -251,14 +255,15 @@ class VexLogic:
             #find the closest generic ball
             findclosestgenericball = True
             
+            #logging.info(blueBalls)
             if findclosestgenericball:
                 #find closest ball in goal
-                if blueBalls:
-                    detectinfo = self.determineClosest(blueBalls, 20)
+                if blueBallsArr:
+                    detectinfo = self.determineClosest(blueBallsArr, 20)
                     detectInfoList.append(copy.copy(detectinfo))
                     detectinfo.display()
-                if redBalls:
-                    detectinfo = self.determineClosest(redBalls, 10)
+                if redBallsArr:
+                    detectinfo = self.determineClosest(redBallsArr, 10)
                     detectInfoList.append(copy.copy(detectinfo))
                     detectinfo.display()
             
@@ -275,8 +280,6 @@ class VexLogic:
             #display elements of detect info list
             for detect in self.detectInfoList:
                 detect.display()
-        
-        
         
         
         
