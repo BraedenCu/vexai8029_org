@@ -199,14 +199,14 @@ class VexLogic:
                 #find closest goal, and go towards it 
                 detectinfo = self.determineClosest(goalsToDescoreRed, 31)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
                 
                 
             if descoring and goalsToDescoreBlue: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
                 detectinfo = self.determineClosest(goalsToDescoreBlue, 32)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
 
             #if we are collecting balls
             collectBall = True
@@ -215,13 +215,13 @@ class VexLogic:
                 #find the closest red ball not in goal
                 detectinfo = self.determineClosest(redBallsNotInGoals, 11)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
             
             if collectBall and blueBallsNotInGoals:
                 #find the closest blue ball not in goal
                 detectinfo = self.determineClosest(blueBallsNotInGoals, 21)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
             
                    
             #find the closest goal for each team and send it to the brain
@@ -235,7 +235,7 @@ class VexLogic:
                 #logging.info(len(goalsToScore))
                 detectinfo = self.determineClosest(goalsToScore, 31)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
                 
         
             #find the closest ball IN a goal and add it to the detect info list
@@ -246,11 +246,11 @@ class VexLogic:
                 if blueBallsInGoals:
                     detectinfo = self.determineClosest(blueBallsInGoals, 22)
                     detectInfoList.append(copy.copy(detectinfo))
-                    detectinfo.display()
+                    #detectinfo.display()
                 if redBallsInGoals:
                     detectinfo = self.determineClosest(redBallsInGoals, 12)
                     detectInfoList.append(copy.copy(detectinfo))
-                    detectinfo.display()
+                    #detectinfo.display()
             
             #find the closest generic ball
             findclosestgenericball = True
@@ -261,17 +261,17 @@ class VexLogic:
                 if blueBallsArr:
                     detectinfo = self.determineClosest(blueBallsArr, 20)
                     detectInfoList.append(copy.copy(detectinfo))
-                    detectinfo.display()
+                    #detectinfo.display()
                 if redBallsArr:
                     detectinfo = self.determineClosest(redBallsArr, 10)
                     detectInfoList.append(copy.copy(detectinfo))
-                    detectinfo.display()
+                    #detectinfo.display()
             
             #find the closest generic goal
             if goalsArr:
                 detectinfo = self.determineClosest(goalsArr, 30)
                 detectInfoList.append(copy.copy(detectinfo))
-                detectinfo.display()
+                #detectinfo.display()
                        
             #if detectInfo is not empty, add it to vexBrain object
             if self.detectInfo:
@@ -279,7 +279,7 @@ class VexLogic:
             
             #display elements of detect info list
             for detect in self.detectInfoList:
-                detect.display()
+                #detect.display()
         
         
         

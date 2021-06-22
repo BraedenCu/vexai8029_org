@@ -502,7 +502,7 @@ class VexBrain:
         self.detectInfoList.clear()
         for detect in diList :
             self.detectInfoList.append(detect)
-            #detect.display()
+            detect.display()
 
     def addMap(self):
         "TBD"
@@ -514,7 +514,7 @@ class VexBrain:
 
     def createMsgFromDetectInfo(self):
         "Build a message to send to the VEX Cortex Brain, based on detect info."
-        #logging.info("createMsgFromDetectInfo - Enter")
+        logging.info("createMsgFromDetectInfo - Enter")
         self.clearMsg()
         #self.setTestData2()
         #self.setTestData3()
