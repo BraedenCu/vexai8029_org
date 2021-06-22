@@ -502,7 +502,7 @@ class VexBrain:
         self.detectInfoList.clear()
         for detect in diList :
             self.detectInfoList.append(detect)
-            detect.display()
+            #detect.display()
 
     def addMap(self):
         "TBD"
@@ -533,8 +533,8 @@ class VexBrain:
         self.mpt.map.posRecord.rot             = 0.0  # TBD - Finish
         for cnt in range(0, numBoxes):
             self.mpt.map.fifoObjBoxes[cnt].mIsActive = True
-            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfoList[cnt].left)
-            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfoList[cnt].top)
+            self.mpt.map.fifoObjBoxes[cnt].x         = int(self.detectInfo.left + (self.detectInfo.right - self.detectInfo.left)/2)
+            self.mpt.map.fifoObjBoxes[cnt].y         = int(self.detectInfo.top + (self.detectInfo.bottom - self.detectInfo.top)/2)
             self.mpt.map.fifoObjBoxes[cnt].width     = int(self.detectInfoList[cnt].width)
             self.mpt.map.fifoObjBoxes[cnt].height    = int(self.detectInfoList[cnt].height)
             self.mpt.map.fifoObjBoxes[cnt].classId   = self.detectInfoList[cnt].classId
