@@ -673,7 +673,8 @@ class VexBrain:
                     #logging.info("RX : %04d %s", self.msgRxCnt, data)
                     #if (self.msgRxCnt % 10) == 0:
                     if (self.msgRxCnt % 1) == 0:
-                        if len(self.detectInfoList) != 0:
+                        #<cdo>if len(self.detectInfoList) != 0:
+                        if len(self.detectInfoList) >= 0:
                             self.createMsgFromDetectInfo()
                             packedMsg = self.mpt.getPackedMsg()
                             #if lastMsg != packedMsg:
