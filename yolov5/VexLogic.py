@@ -189,7 +189,7 @@ class VexLogic:
             
             
             #if we are descoring, find closest ball for each color to descore
-            descoring = True
+            descoring = False
                         
             if descoring and goalsToDescoreRed: #goals to score need to be detected to score
                 #find closest goal, and go towards it 
@@ -222,7 +222,7 @@ class VexLogic:
                    
             #find the closest goal for each team and send it to the brain
             #if we have a ball in our robot and need to score
-            scoringBall = True
+            scoringBall = False
             closestGoal = None
             
             if scoringBall and goalsToScore: #goals to score need to be detected to score
