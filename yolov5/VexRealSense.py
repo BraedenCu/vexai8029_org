@@ -264,7 +264,7 @@ class VexRealSense:
                                             
                                     #process detection if class if 2 (green top)
                                     if c == 2:
-                                        if conf > 0.5:
+                                        if conf > 0.2:
                                             numTargets += 1
                                             #logging.info("detected goal")
                                             #add detections to detect realsense class
